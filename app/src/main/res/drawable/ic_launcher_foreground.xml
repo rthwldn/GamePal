@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Outer Glow -->
+    <path
+        android:pathData="M38,36 C31,36 27,41 27,51 C27,63 32,74 38,74 C43,74 46,67 50,67 C54,67 54,67 58,67 C62,67 65,74 70,74 C76,74 81,63 81,51 C81,41 77,36 70,36 C64,36 59,38 54,38 C49,38 44,36 38,36 Z"
+        android:strokeWidth="3"
+        android:strokeColor="#60818CF8" />
+
+    <!-- Main Controller Body with Gradient -->
+    <path
+        android:pathData="M38,36 C31,36 27,41 27,51 C27,63 32,74 38,74 C43,74 46,67 50,67 C54,67 54,67 58,67 C62,67 65,74 70,74 C76,74 81,63 81,51 C81,41 77,36 70,36 C64,36 59,38 54,38 C49,38 44,36 38,36 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="27"
+                android:startY="36"
+                android:endX="81"
+                android:endY="74"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#FFFFFF" />
+                <item android:offset="1.0" android:color="#E0E7FF" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- D-Pad (Left Side) -->
+    <path
+        android:pathData="M38,44 L40,44 L40,48 L44,48 L44,50 L40,50 L40,54 L38,54 L38,50 L34,50 L34,48 L38,48 Z"
+        android:fillColor="#4F46E5" />
+
+    <!-- Action Buttons (Right Side) -->
+    <!-- Top Button (Y/Triangle) -->
+    <path
+        android:pathData="M70,43 A2,2 0 1 0 70,47 A2,2 0 1 0 70,43 Z"
+        android:fillColor="#10B981" />
+    <!-- Right Button (B/Circle) -->
+    <path
+        android:pathData="M74,47 A2,2 0 1 0 74,51 A2,2 0 1 0 74,47 Z"
+        android:fillColor="#EF4444" />
+    <!-- Bottom Button (A/Cross) -->
+    <path
+        android:pathData="M70,51 A2,2 0 1 0 70,55 A2,2 0 1 0 70,51 Z"
+        android:fillColor="#3B82F6" />
+    <!-- Left Button (X/Square) -->
+    <path
+        android:pathData="M66,47 A2,2 0 1 0 66,51 A2,2 0 1 0 66,47 Z"
+        android:fillColor="#F59E0B" />
+
+    <!-- Left Thumbstick -->
+    <path
+        android:pathData="M45,56 A3.5,3.5 0 1 0 45,63 A3.5,3.5 0 1 0 45,56 Z"
+        android:fillColor="#312E81" />
+    <path
+        android:pathData="M45,57.5 A2,2 0 1 0 45,61.5 A2,2 0 1 0 45,57.5 Z"
+        android:fillColor="#6366F1" />
+
+    <!-- Right Thumbstick -->
+    <path
+        android:pathData="M63,56 A3.5,3.5 0 1 0 63,63 A3.5,3.5 0 1 0 63,56 Z"
+        android:fillColor="#312E81" />
+    <path
+        android:pathData="M63,57.5 A2,2 0 1 0 63,61.5 A2,2 0 1 0 63,57.5 Z"
+        android:fillColor="#6366F1" />
+
+    <!-- Center Play/Pulse Light -->
+    <path
+        android:pathData="M54,46 A2,2 0 1 0 54,50 A2,2 0 1 0 54,46 Z"
+        android:fillColor="#06B6D4" />
+</vector>
