@@ -43,9 +43,31 @@ data class ActiveGameSession(
 object SessionManager {
     private val scope = CoroutineScope(Dispatchers.Main + Job())
     private var timerJob: Job? = null
+    private var isAppInForeground: Boolean = false
 
     private val _activeSession = MutableStateFlow<ActiveGameSession?>(null)
     val activeSession: StateFlow<ActiveGameSession?> = _activeSession.asStateFlow()
+
+    fun setAppInForeground(inForeground: Boolean) {
+        isAppInForeground = inForeground
+        if (inForeground) {
+            val current = _activeSession.value
+            if (current != null && !current.isPaused) {
+                val updatedSeconds = calculateElapsedSeconds(
+                    accumulatedMs = current.accumulatedElapsedMs,
+                    lastResumeMs = current.lastResumeRealtimeMs,
+                    isPaused = false
+                )
+                _activeSession.value = current.copy(elapsedSeconds = updatedSeconds)
+                startTimerLoop()
+            }
+        } else {
+            // App entered background or phone locked: stop coroutine ticker completely to consume 0% battery.
+            // Hardware chronometer handles the lockscreen notification without CPU wakeups.
+            timerJob?.cancel()
+            timerJob = null
+        }
+    }
 
     /**
      * Calculates the accurate elapsed seconds using SystemClock.elapsedRealtime(),
@@ -106,6 +128,7 @@ object SessionManager {
                 elapsedSeconds = currentSeconds
             )
             timerJob?.cancel()
+            timerJob = null
             updateForegroundService(context)
         }
     }
@@ -144,6 +167,7 @@ object SessionManager {
     fun stopSession(context: Context): ActiveGameSession? {
         val current = _activeSession.value
         timerJob?.cancel()
+        timerJob = null
         _activeSession.value = null
         stopForegroundService(context)
 
@@ -157,14 +181,14 @@ object SessionManager {
     }
 
     /**
-     * Periodic loop to refresh UI states.
-     * Crucially, instead of incrementing +1 on every tick (which loses time during CPU sleep/lock),
-     * it evaluates the actual elapsed real time since lastResumeRealtimeMs.
+     * Periodic loop to refresh UI states only while app is visible in foreground.
      */
     private fun startTimerLoop() {
         timerJob?.cancel()
+        if (!isAppInForeground) return
+
         timerJob = scope.launch {
-            while (isActive) {
+            while (isActive && isAppInForeground) {
                 delay(1000L)
                 val current = _activeSession.value
                 if (current != null && !current.isPaused) {
@@ -174,6 +198,8 @@ object SessionManager {
                         isPaused = false
                     )
                     _activeSession.value = current.copy(elapsedSeconds = updatedSeconds)
+                } else {
+                    break
                 }
             }
         }
@@ -181,6 +207,7 @@ object SessionManager {
 
     fun cancelSession(context: Context) {
         timerJob?.cancel()
+        timerJob = null
         _activeSession.value = null
         stopForegroundService(context)
     }

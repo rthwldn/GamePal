@@ -144,12 +144,22 @@ class GameSessionTrackingService : Service() {
                         android.util.Log.e("GameSessionTrackingService", "startForeground failed", e)
                     }
                 } else {
+                    stopForeground(STOP_FOREGROUND_REMOVE)
                     stopSelf()
                 }
             }
         }
 
-        return START_STICKY
+        return START_NOT_STICKY
+    }
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+        val current = SessionManager.activeSession.value
+        if (current == null) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+            stopSelf()
+        }
     }
 
     private fun buildNotification(session: ActiveGameSession): Notification {

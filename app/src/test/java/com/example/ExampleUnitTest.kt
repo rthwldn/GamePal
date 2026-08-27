@@ -49,5 +49,26 @@ class ExampleUnitTest {
         )
         assertEquals("45s", session2.formattedDuration)
     }
+
+    @Test
+    fun testActiveGameSessionFormatting() {
+        val activeSession = com.example.service.ActiveGameSession(
+            gameId = 1L,
+            gameTitle = "Cyberpunk 2077",
+            platform = "PC",
+            coverUrl = "",
+            elapsedSeconds = 7325L // 2h 2m 5s
+        )
+        assertEquals("02:02:05", activeSession.formattedTime)
+
+        val shortSession = com.example.service.ActiveGameSession(
+            gameId = 1L,
+            gameTitle = "Tetris",
+            platform = "Game Boy",
+            coverUrl = "",
+            elapsedSeconds = 85L // 1m 25s
+        )
+        assertEquals("01:25", shortSession.formattedTime)
+    }
 }
 

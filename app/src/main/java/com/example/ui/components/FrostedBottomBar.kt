@@ -5,6 +5,7 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -69,17 +70,49 @@ fun FrostedBottomBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        Color.Transparent,
+                        Color(0x550F1117),
+                        Color(0xB30F1117),
+                        Color(0xEE0F1117),
+                        Color(0xFF0F1117)
+                    )
+                )
+            )
             .windowInsetsPadding(WindowInsets.navigationBars)
-            .padding(horizontal = 20.dp, vertical = 10.dp),
+            .padding(start = 20.dp, end = 20.dp, top = 22.dp, bottom = 12.dp),
         contentAlignment = Alignment.Center
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .glassCard(
+                .shadow(
+                    elevation = 16.dp,
                     shape = RoundedCornerShape(26.dp),
-                    isDark = isDark,
-                    elevation = 12.dp
+                    spotColor = Color(0x99000000),
+                    ambientColor = Color(0x44000000)
+                )
+                .clip(RoundedCornerShape(26.dp))
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xF01E2433), // Top specular frosted glass
+                            Color(0xF5141824), // Mid body
+                            Color(0xF90F111A)  // Bottom depth
+                        )
+                    )
+                )
+                .border(
+                    width = 1.dp,
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0x40FFFFFF), // Crisp top highlight
+                            Color(0x10FFFFFF)  // Subtle bottom rim
+                        )
+                    ),
+                    shape = RoundedCornerShape(26.dp)
                 )
                 .padding(horizontal = 10.dp, vertical = 8.dp)
         ) {
