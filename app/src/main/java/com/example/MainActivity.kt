@@ -5,6 +5,8 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -59,7 +61,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+        )
 
         // Check if opened from Live Activity notification
         val openGameId = intent.getLongExtra("GAME_ID", -1L)
@@ -102,6 +107,19 @@ fun GamePalApp(viewModel: GamePalViewModel) {
     val selectedGame by viewModel.selectedGame.collectAsState()
     var currentTab by remember { mutableStateOf(MainNavTab.HOME) }
     var showAddDialog by remember { mutableStateOf(false) }
+
+    // Gesture navigation handlers
+    BackHandler(enabled = selectedGame != null) {
+        viewModel.selectGame(null)
+    }
+
+    BackHandler(enabled = selectedGame == null && showAddDialog) {
+        showAddDialog = false
+    }
+
+    BackHandler(enabled = selectedGame == null && !showAddDialog && currentTab != MainNavTab.HOME) {
+        currentTab = MainNavTab.HOME
+    }
 
     val blurRadius by animateDpAsState(
         targetValue = if (showAddDialog) 24.dp else 0.dp,

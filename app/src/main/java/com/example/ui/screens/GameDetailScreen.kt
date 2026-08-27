@@ -1,5 +1,6 @@
 package com.example.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -104,6 +105,17 @@ fun GameDetailScreen(
     var sessionNotesInput by remember { mutableStateOf("") }
 
     val currentStatus = GameStatus.fromString(game.status)
+
+    // Gesture navigation handler: closes dialogs if open, or returns to main screen
+    BackHandler {
+        when {
+            showDeleteConfirm -> showDeleteConfirm = false
+            showManualTimeDialog -> showManualTimeDialog = false
+            showStopSessionDialog -> showStopSessionDialog = false
+            showStatusDropdown -> showStatusDropdown = false
+            else -> onBack()
+        }
+    }
 
     Scaffold(
         topBar = {

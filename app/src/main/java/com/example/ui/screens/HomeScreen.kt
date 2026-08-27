@@ -1,5 +1,6 @@
 package com.example.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -105,6 +106,17 @@ fun HomeScreen(
     val currentSort by viewModel.sortOption.collectAsState()
 
     var showSortMenu by remember { mutableStateOf(false) }
+
+    // Gesture navigation handler: if searching or filtering, back clears search or filters
+    val hasActiveFilterOrSearch = searchQuery.isNotEmpty() || selectedStatus != null || selectedPlatform != null
+    BackHandler(enabled = hasActiveFilterOrSearch) {
+        if (searchQuery.isNotEmpty()) {
+            viewModel.searchQuery.value = ""
+        } else {
+            viewModel.selectedStatusFilter.value = null
+            viewModel.selectedPlatformFilter.value = null
+        }
+    }
 
     Scaffold(
         topBar = {
