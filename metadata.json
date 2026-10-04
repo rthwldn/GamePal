@@ -1,6 +1,6 @@
 {
-  "name": "GamePal",
-  "description": "Her tracker herního času, správa herní knihovny, hodnocení 1-10, recenze, Live Activity a podpora retro i moderních platforem s matným skleněným designem.",
+  "name": "PlayPulse",
+  "description": "Chytrý tracker herního času, správa herní knihovny, hodnocení 1-10, recenze, Live Activity a podpora retro i moderních platforem s matným skleněným designem.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

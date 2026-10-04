@@ -40,7 +40,7 @@ class GameSessionTrackingService : Service() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 val channel = NotificationChannel(
                     CHANNEL_ID,
-                    "Live Activity - Herní čas",
+                    "PlayPulse - Aktivní hraní",
                     NotificationManager.IMPORTANCE_LOW
                 ).apply {
                     description = "Zobrazuje aktivní čas hraní na zamčené obrazovce a v liště oznámení"

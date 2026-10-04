@@ -22,6 +22,6 @@ dependencyResolutionManagement {
   }
 }
 
-rootProject.name = "GamePal"
+rootProject.name = "PlayPulse"
 
 include(":app")

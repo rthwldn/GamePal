@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">GamePal</string>
+    <string name="app_name">PlayPulse</string>
     <string name="widget_name">Herní přehled (Samsung styl)</string>
     <string name="widget_description">Týdenní aktivita hraní a naposledy hraná hra s časem.</string>
 </resources>

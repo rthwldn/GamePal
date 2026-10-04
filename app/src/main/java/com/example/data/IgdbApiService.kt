@@ -40,7 +40,7 @@ class GameMetadataService {
             // Try open search endpoint
             val request = Request.Builder()
                 .url("https://api.rawg.io/api/games?key=c542e67aec3a4340908f9de9e86038af&search=$encodedQuery&page_size=10")
-                .header("User-Agent", "GamePal-Android-App")
+                .header("User-Agent", "PlayPulse-Android-App")
                 .build()
 
             val response = client.newCall(request).execute()
