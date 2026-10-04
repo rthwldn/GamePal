@@ -1,332 +1,305 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/widget_background"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:padding="14dp">
+    android:layout_height="match_parent">
 
-    <!-- LEFT SECTION: WEEKLY ACTIVITY (Monday to Sunday dots) -->
-    <LinearLayout
-        android:id="@+id/widget_left_section"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1.15"
-        android:orientation="vertical"
-        android:paddingEnd="6dp">
-
-        <!-- Header: Tento týden & Day Count Badge -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="TENTO TÝDEN"
-                android:textColor="#9CA3AF"
-                android:textSize="10sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/widget_week_badge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:text="• 0/7"
-                android:textColor="#10B981"
-                android:textSize="10sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <!-- Dots & Days Row (Po - Ne) -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <!-- Pondělí -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center_horizontal"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:id="@+id/widget_dot_mon"
-                    android:layout_width="11dp"
-                    android:layout_height="11dp"
-                    android:contentDescription="Pondělí aktivita"
-                    android:src="@drawable/widget_dot_unplayed" />
-
-                <TextView
-                    android:id="@+id/widget_day_mon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Po"
-                    android:textColor="#858D9D"
-                    android:textSize="9.5sp" />
-            </LinearLayout>
-
-            <!-- Úterý -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center_horizontal"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:id="@+id/widget_dot_tue"
-                    android:layout_width="11dp"
-                    android:layout_height="11dp"
-                    android:contentDescription="Úterý aktivita"
-                    android:src="@drawable/widget_dot_unplayed" />
-
-                <TextView
-                    android:id="@+id/widget_day_tue"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Út"
-                    android:textColor="#858D9D"
-                    android:textSize="9.5sp" />
-            </LinearLayout>
-
-            <!-- Středa -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center_horizontal"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:id="@+id/widget_dot_wed"
-                    android:layout_width="11dp"
-                    android:layout_height="11dp"
-                    android:contentDescription="Středa aktivita"
-                    android:src="@drawable/widget_dot_unplayed" />
-
-                <TextView
-                    android:id="@+id/widget_day_wed"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="St"
-                    android:textColor="#858D9D"
-                    android:textSize="9.5sp" />
-            </LinearLayout>
-
-            <!-- Čtvrtek -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center_horizontal"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:id="@+id/widget_dot_thu"
-                    android:layout_width="11dp"
-                    android:layout_height="11dp"
-                    android:contentDescription="Čtvrtek aktivita"
-                    android:src="@drawable/widget_dot_unplayed" />
-
-                <TextView
-                    android:id="@+id/widget_day_thu"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Čt"
-                    android:textColor="#858D9D"
-                    android:textSize="9.5sp" />
-            </LinearLayout>
-
-            <!-- Pátek -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center_horizontal"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:id="@+id/widget_dot_fri"
-                    android:layout_width="11dp"
-                    android:layout_height="11dp"
-                    android:contentDescription="Pátek aktivita"
-                    android:src="@drawable/widget_dot_unplayed" />
-
-                <TextView
-                    android:id="@+id/widget_day_fri"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Pá"
-                    android:textColor="#858D9D"
-                    android:textSize="9.5sp" />
-            </LinearLayout>
-
-            <!-- Sobota -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center_horizontal"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:id="@+id/widget_dot_sat"
-                    android:layout_width="11dp"
-                    android:layout_height="11dp"
-                    android:contentDescription="Sobota aktivita"
-                    android:src="@drawable/widget_dot_unplayed" />
-
-                <TextView
-                    android:id="@+id/widget_day_sat"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="So"
-                    android:textColor="#858D9D"
-                    android:textSize="9.5sp" />
-            </LinearLayout>
-
-            <!-- Neděle -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center_horizontal"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:id="@+id/widget_dot_sun"
-                    android:layout_width="11dp"
-                    android:layout_height="11dp"
-                    android:contentDescription="Neděle aktivita"
-                    android:src="@drawable/widget_dot_unplayed" />
-
-                <TextView
-                    android:id="@+id/widget_day_sun"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Ne"
-                    android:textColor="#858D9D"
-                    android:textSize="9.5sp" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <!-- Subtext: Streak or summary -->
-        <TextView
-            android:id="@+id/widget_status_subtext"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:text="Aktivní týdenní přehled"
-            android:textColor="#6B7280"
-            android:textSize="9sp" />
-    </LinearLayout>
-
-    <!-- Subtle vertical divider -->
+    <!-- DYNAMIC GAME PALETTE BACKGROUND -->
     <ImageView
-        android:layout_width="1dp"
+        android:id="@+id/widget_background_img"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="4dp"
         android:contentDescription="@null"
-        android:src="@drawable/widget_divider" />
+        android:scaleType="fitXY"
+        android:src="@drawable/widget_background" />
 
-    <!-- RIGHT SECTION: LAST PLAYED GAME (Cover + Info + Time) -->
+    <!-- CONTENT CONTAINER -->
     <LinearLayout
-        android:id="@+id/widget_right_card"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1.25"
-        android:background="@drawable/widget_game_card_bg"
-        android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:padding="8dp">
+        android:padding="22dp">
 
-        <!-- Cover Image -->
-        <ImageView
-            android:id="@+id/widget_game_cover"
-            android:layout_width="48dp"
-            android:layout_height="62dp"
-            android:background="@drawable/widget_cover_placeholder"
-            android:contentDescription="Obrázek naposledy hrané hry"
-            android:scaleType="centerCrop" />
-
-        <!-- Game Title and Time details -->
+        <!-- LEFT SIDE: ADAPTIVE COVER ART + TIME & TITLE -->
         <LinearLayout
+            android:id="@+id/widget_left_section"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:layout_weight="1.2"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/widget_game_status_label"
+            <!-- Cover Art Frame: expands flexibly to available height -->
+            <FrameLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:text="NAPOSLEDY HRÁNO"
-                android:textColor="#9CA3AF"
-                android:textSize="9sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/widget_game_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:ellipsize="end"
-                android:maxLines="2"
-                android:text="Zatím žádná hra"
-                android:textColor="#FFFFFF"
-                android:textSize="12.5sp"
-                android:textStyle="bold" />
-
-            <!-- Time played container -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:layout_height="0dp"
+                android:layout_weight="1">
 
                 <ImageView
-                    android:layout_width="12dp"
-                    android:layout_height="12dp"
-                    android:contentDescription="Čas"
-                    android:src="@drawable/ic_widget_clock" />
+                    android:id="@+id/widget_game_cover"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="Obrázek naposledy hrané hry"
+                    android:maxWidth="180dp"
+                    android:minWidth="80dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/widget_cover_placeholder" />
+            </FrameLayout>
+
+            <!-- Time & Game Title -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/widget_game_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
+                    android:text="0m"
+                    android:textColor="#FFFFFF"
+                    android:textSize="32sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/widget_game_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="0m"
-                    android:textColor="#10B981"
-                    android:textSize="11.5sp"
+                    android:text="Zatím žádná hra"
+                    android:textColor="#FFFFFF"
+                    android:textSize="19sp"
                     android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- RIGHT SIDE: STREAK HEADER & 7 DAYS ACTIVITY ROW (CENTERED VERTICALLY) -->
+        <LinearLayout
+            android:id="@+id/widget_right_section"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center_vertical|end"
+            android:orientation="vertical">
+
+            <!-- STREAK Header: Flame icon + STREAK -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:contentDescription="Streak"
+                    android:src="@drawable/ic_widget_flame" />
+
+                <TextView
+                    android:id="@+id/widget_streak_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:letterSpacing="0.08"
+                    android:text="STREAK"
+                    android:textColor="#FFFFFF"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- 7 Days Activity (M T W T F S S) -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <!-- Monday (M) -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/widget_dot_mon"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:contentDescription="Monday"
+                        android:src="@drawable/widget_dot_unplayed" />
+
+                    <TextView
+                        android:id="@+id/widget_day_mon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="M"
+                        android:textColor="#B3FFFFFF"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Tuesday (T) -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/widget_dot_tue"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:contentDescription="Tuesday"
+                        android:src="@drawable/widget_dot_unplayed" />
+
+                    <TextView
+                        android:id="@+id/widget_day_tue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="T"
+                        android:textColor="#B3FFFFFF"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Wednesday (W) -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/widget_dot_wed"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:contentDescription="Wednesday"
+                        android:src="@drawable/widget_dot_unplayed" />
+
+                    <TextView
+                        android:id="@+id/widget_day_wed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="W"
+                        android:textColor="#B3FFFFFF"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Thursday (T) -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/widget_dot_thu"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:contentDescription="Thursday"
+                        android:src="@drawable/widget_dot_unplayed" />
+
+                    <TextView
+                        android:id="@+id/widget_day_thu"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="T"
+                        android:textColor="#B3FFFFFF"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Friday (F) -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/widget_dot_fri"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:contentDescription="Friday"
+                        android:src="@drawable/widget_dot_unplayed" />
+
+                    <TextView
+                        android:id="@+id/widget_day_fri"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="F"
+                        android:textColor="#B3FFFFFF"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Saturday (S) -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/widget_dot_sat"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:contentDescription="Saturday"
+                        android:src="@drawable/widget_dot_unplayed" />
+
+                    <TextView
+                        android:id="@+id/widget_day_sat"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="S"
+                        android:textColor="#B3FFFFFF"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Sunday (S) -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/widget_dot_sun"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:contentDescription="Sunday"
+                        android:src="@drawable/widget_dot_unplayed" />
+
+                    <TextView
+                        android:id="@+id/widget_day_sun"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="S"
+                        android:textColor="#B3FFFFFF"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 
-</LinearLayout>
+</FrameLayout>

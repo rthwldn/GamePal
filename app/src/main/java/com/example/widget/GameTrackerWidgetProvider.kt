@@ -42,6 +42,7 @@ class GameTrackerWidgetProvider : AppWidgetProvider() {
             try {
                 // Immediately provide initial view so launcher never encounters an empty or missing view
                 val initialViews = RemoteViews(context.packageName, R.layout.widget_game_tracker)
+                initialViews.setImageViewResource(R.id.widget_background_img, R.drawable.widget_background)
                 val mainIntent = Intent(context, MainActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
                 }
@@ -125,9 +126,9 @@ class GameTrackerWidgetProvider : AppWidgetProvider() {
                 val todayDow = todayCal.get(Calendar.DAY_OF_WEEK)
                 val todayIndex = if (todayDow == Calendar.SUNDAY) 6 else todayDow - Calendar.MONDAY
 
-                // Load cover bitmap if last game exists
-                val coverBitmap: Bitmap? = if (lastGame != null && lastGame.coverUrl.isNotBlank()) {
-                    loadCoverBitmap(context, lastGame.coverUrl)
+                // Load cover and extract dominant palette if last game exists
+                val coverData: CoverArtData? = if (lastGame != null && lastGame.coverUrl.isNotBlank()) {
+                    loadCoverData(context, lastGame.coverUrl)
                 } else null
 
                 // Build RemoteViews
@@ -165,33 +166,23 @@ class GameTrackerWidgetProvider : AppWidgetProvider() {
                     }
                     views.setImageViewResource(dotIds[i], dotDrawable)
 
-                    // Text color: highlight today
-                    val textColor = if (isToday) 0xFFFFFFFF.toInt() else 0xFF858D9D.toInt()
+                    // Text color: highlight today with pure white, other days semi-transparent
+                    val textColor = if (isToday) 0xFFFFFFFF.toInt() else 0xB3FFFFFF.toInt()
                     views.setTextColor(dayTextIds[i], textColor)
                 }
 
-                // Summary text and badge
-                val playedCount = hasPlayedDay.count { it }
-                views.setTextViewText(R.id.widget_week_badge, "• $playedCount/7")
-
-                val summaryText = when {
-                    playedCount == 0 -> "Zatím žádné hraní v tomto týdnu"
-                    playedCount == 1 -> "1 aktivní den tento týden 🎮"
-                    playedCount in 2..4 -> "$playedCount aktivní dny tento týden 🎮"
-                    else -> "$playedCount aktivních dní! Jste ve formě 🔥"
-                }
-                views.setTextViewText(R.id.widget_status_subtext, summaryText)
-
-                // 2. Update Right Section: Last Played Game
+                // 2. Update Left Section: Last Played Game & Dynamic Background
                 if (lastGame != null) {
-                    views.setTextViewText(R.id.widget_game_status_label, "NAPOSLEDY HRÁNO")
                     views.setTextViewText(R.id.widget_game_title, lastGame.title)
                     views.setTextViewText(R.id.widget_game_time, lastGame.formattedTotalTime)
 
-                    if (coverBitmap != null) {
-                        views.setImageViewBitmap(R.id.widget_game_cover, coverBitmap)
+                    if (coverData != null) {
+                        views.setImageViewBitmap(R.id.widget_game_cover, coverData.coverBitmap)
+                        val dynamicBg = createDynamicWidgetBackground(context, coverData.dominantColor)
+                        views.setImageViewBitmap(R.id.widget_background_img, dynamicBg)
                     } else {
                         views.setImageViewResource(R.id.widget_game_cover, R.drawable.widget_cover_placeholder)
+                        views.setImageViewResource(R.id.widget_background_img, R.drawable.widget_background)
                     }
 
                     // Intent to open this game's detail directly
@@ -205,23 +196,12 @@ class GameTrackerWidgetProvider : AppWidgetProvider() {
                         gameDetailIntent,
                         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                     )
-                    views.setOnClickPendingIntent(R.id.widget_right_card, gamePendingIntent)
+                    views.setOnClickPendingIntent(R.id.widget_game_cover, gamePendingIntent)
                 } else {
-                    views.setTextViewText(R.id.widget_game_status_label, "GAMEPAL")
-                    views.setTextViewText(R.id.widget_game_title, "Žádná hra")
+                    views.setTextViewText(R.id.widget_game_title, "Zatím žádná hra")
                     views.setTextViewText(R.id.widget_game_time, "0m")
                     views.setImageViewResource(R.id.widget_game_cover, R.drawable.widget_cover_placeholder)
-
-                    val mainIntent = Intent(context, MainActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    }
-                    val mainPendingIntent = PendingIntent.getActivity(
-                        context,
-                        101,
-                        mainIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                    )
-                    views.setOnClickPendingIntent(R.id.widget_right_card, mainPendingIntent)
+                    views.setImageViewResource(R.id.widget_background_img, R.drawable.widget_background)
                 }
 
                 // Left side and Root click intent -> Open Main App
@@ -235,6 +215,7 @@ class GameTrackerWidgetProvider : AppWidgetProvider() {
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                 )
                 views.setOnClickPendingIntent(R.id.widget_left_section, mainPendingIntent)
+                views.setOnClickPendingIntent(R.id.widget_right_section, mainPendingIntent)
                 views.setOnClickPendingIntent(R.id.widget_root, mainPendingIntent)
 
                 // Commit widget update
@@ -259,31 +240,146 @@ class GameTrackerWidgetProvider : AppWidgetProvider() {
         return cal.timeInMillis
     }
 
-    private suspend fun loadCoverBitmap(context: Context, url: String): Bitmap? {
+    private data class CoverArtData(
+        val coverBitmap: Bitmap,
+        val dominantColor: Int
+    )
+
+    private suspend fun loadCoverData(context: Context, url: String): CoverArtData? {
         return try {
             val loader = Coil.imageLoader(context)
             val request = ImageRequest.Builder(context)
                 .data(url)
                 .allowHardware(false) // RemoteViews require software bitmap!
-                .size(160, 210)
                 .build()
             val result = (loader.execute(request) as? SuccessResult)?.drawable
             val raw = (result as? BitmapDrawable)?.bitmap ?: return null
-            createRoundedBitmap(raw, 24f)
+            val dominantColor = extractDominantColor(raw)
+            val roundedCover = createRoundedPortraitBitmap(raw, 26f)
+            CoverArtData(roundedCover, dominantColor)
         } catch (_: Exception) {
             null
         }
     }
 
-    private fun createRoundedBitmap(src: Bitmap, cornerRadiusPx: Float): Bitmap {
-        val output = Bitmap.createBitmap(src.width, src.height, Bitmap.Config.ARGB_8888)
+    private fun extractDominantColor(bitmap: Bitmap): Int {
+        return try {
+            val smallBitmap = Bitmap.createScaledBitmap(bitmap, 32, 32, true)
+            val width = smallBitmap.width
+            val height = smallBitmap.height
+            val pixels = IntArray(width * height)
+            smallBitmap.getPixels(pixels, 0, width, 0, 0, width, height)
+
+            var bestColor = 0xFF8A1C14.toInt() // Default fallback crimson
+            var maxScore = -1f
+            val hsv = FloatArray(3)
+
+            for (pixel in pixels) {
+                val r = (pixel shr 16) and 0xFF
+                val g = (pixel shr 8) and 0xFF
+                val b = pixel and 0xFF
+
+                android.graphics.Color.RGBToHSV(r, g, b, hsv)
+                val saturation = hsv[1]
+                val value = hsv[2]
+
+                // Discard near-black shadows or washed out whites
+                if (value < 0.15f || value > 0.95f || saturation < 0.22f) continue
+
+                // Score favoring vibrant colors with moderate to high brightness
+                val score = saturation * 2.2f + (1f - kotlin.math.abs(value - 0.65f))
+                if (score > maxScore) {
+                    maxScore = score
+                    bestColor = pixel
+                }
+            }
+            bestColor
+        } catch (_: Exception) {
+            0xFF8A1C14.toInt()
+        }
+    }
+
+    private fun createDynamicWidgetBackground(
+        context: Context,
+        dominantColor: Int,
+        widthPx: Int = 800,
+        heightPx: Int = 400
+    ): Bitmap {
+        return try {
+            val hsv = FloatArray(3)
+            android.graphics.Color.colorToHSV(dominantColor, hsv)
+
+            val hue = hsv[0]
+            val sat = hsv[1].coerceIn(0.6f, 0.95f)
+
+            // 1. Top-Left: Warm rich accent (vibrant, matches game art)
+            val colorStart = android.graphics.Color.HSVToColor(floatArrayOf(hue, sat, 0.55f))
+            // 2. Center: Deep rich tone
+            val colorMid = android.graphics.Color.HSVToColor(floatArrayOf(hue, sat * 0.9f, 0.32f))
+            // 3. Bottom-Right: Deep shadow / vignette
+            val colorEnd = android.graphics.Color.HSVToColor(floatArrayOf(hue, sat * 0.8f, 0.12f))
+
+            val bitmap = Bitmap.createBitmap(widthPx, heightPx, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(bitmap)
+
+            val density = context.resources.displayMetrics.density
+            val gradient = android.graphics.drawable.GradientDrawable(
+                android.graphics.drawable.GradientDrawable.Orientation.TL_BR,
+                intArrayOf(colorStart, colorMid, colorEnd)
+            ).apply {
+                cornerRadius = 28f * density
+                setStroke((1.5f * density).toInt(), 0x2AFFFFFF.toInt())
+                setBounds(0, 0, widthPx, heightPx)
+            }
+            gradient.draw(canvas)
+            bitmap
+        } catch (_: Exception) {
+            Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
+        }
+    }
+
+    private fun createRoundedPortraitBitmap(
+        src: Bitmap,
+        cornerRadiusPx: Float,
+        destWidth: Int = 360,
+        destHeight: Int = 500
+    ): Bitmap {
+        // Target aspect ratio for physical game box (approx 1 : 1.39)
+        val targetRatio = destWidth.toFloat() / destHeight.toFloat()
+        val srcRatio = src.width.toFloat() / src.height.toFloat()
+
+        val srcCropRect = if (srcRatio > targetRatio) {
+            // Source is wider than portrait (e.g. landscape 16:9) -> crop sides to keep center
+            val cropWidth = (src.height * targetRatio).toInt()
+            val left = (src.width - cropWidth) / 2
+            Rect(left, 0, left + cropWidth, src.height)
+        } else {
+            // Source is taller than target portrait -> crop top/bottom
+            val cropHeight = (src.width / targetRatio).toInt()
+            val top = (src.height - cropHeight) / 2
+            Rect(0, top, src.width, top + cropHeight)
+        }
+
+        val output = Bitmap.createBitmap(destWidth, destHeight, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(output)
-        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-        val rect = Rect(0, 0, src.width, src.height)
-        val rectF = RectF(rect)
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
+
+        // Draw rounded rectangle mask
+        val rectF = RectF(0f, 0f, destWidth.toFloat(), destHeight.toFloat())
         canvas.drawRoundRect(rectF, cornerRadiusPx, cornerRadiusPx, paint)
+
+        // Clip src into destination using SRC_IN
         paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
-        canvas.drawBitmap(src, rect, rect, paint)
+        val destRect = Rect(0, 0, destWidth, destHeight)
+        canvas.drawBitmap(src, srcCropRect, destRect, paint)
+
+        // Subtle physical collectible box border
+        paint.xfermode = null
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = 2.5f
+        paint.color = 0x3DFFFFFF.toInt()
+        canvas.drawRoundRect(rectF, cornerRadiusPx, cornerRadiusPx, paint)
+
         return output
     }
 
