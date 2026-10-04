@@ -31,11 +31,17 @@ class GamePalApplication : Application() {
         // Initialize Live Activity Notification Channel
         GameSessionTrackingService.createNotificationChannel(this)
 
-        // Seed initial data if needed (runs once if DB empty)
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                repository.seedInitialDataIfNeeded()
-            } catch (_: Exception) {}
+        // Clear pre-populated sample games once so library is 100% clean for user
+        val prefs = getSharedPreferences("gamepal_prefs", MODE_PRIVATE)
+        val hasCleared = prefs.getBoolean("has_cleared_sample_data_v1", false)
+        if (!hasCleared) {
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    database.clearAllTables()
+                    prefs.edit().putBoolean("has_cleared_sample_data_v1", true).apply()
+                    com.example.widget.GameTrackerWidgetProvider.updateAllWidgets(this@GamePalApplication)
+                } catch (_: Exception) {}
+            }
         }
 
         // Register Activity Lifecycle Callbacks to optimize battery:

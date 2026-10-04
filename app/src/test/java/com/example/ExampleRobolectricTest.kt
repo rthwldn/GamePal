@@ -17,5 +17,7 @@ class ExampleRobolectricTest {
     val context = ApplicationProvider.getApplicationContext<Context>()
     val appName = context.getString(R.string.app_name)
     assertEquals("GamePal", appName)
+    val widgetName = context.getString(R.string.widget_name)
+    assertEquals("Herní přehled (Samsung styl)", widgetName)
   }
 }

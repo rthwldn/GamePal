@@ -55,4 +55,10 @@ interface GameDao {
 
     @Query("SELECT SUM(totalPlayTimeSeconds) FROM games")
     fun getTotalLibraryPlayTime(): Flow<Long?>
+
+    @Query("SELECT * FROM games ORDER BY lastPlayedTimestamp DESC, addedTimestamp DESC LIMIT 1")
+    suspend fun getLastPlayedGame(): GameEntity?
+
+    @Query("SELECT * FROM games WHERE lastPlayedTimestamp IS NOT NULL ORDER BY lastPlayedTimestamp DESC")
+    suspend fun getPlayedGamesDirect(): List<GameEntity>
 }

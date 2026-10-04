@@ -38,6 +38,19 @@
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="Live Activity game play session tracking timer on lockscreen" />
         </service>
+
+        <receiver
+            android:name=".widget.GameTrackerWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.example.action.WIDGET_FORCE_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/game_tracker_widget_info" />
+        </receiver>
     </application>
 
 </manifest>

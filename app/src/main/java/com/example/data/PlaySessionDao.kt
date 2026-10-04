@@ -30,4 +30,10 @@ interface PlaySessionDao {
 
     @Query("SELECT SUM(durationSeconds) FROM play_sessions WHERE gameId = :gameId")
     suspend fun getTotalDurationForGame(gameId: Long): Long?
+
+    @Query("SELECT * FROM play_sessions WHERE endTime >= :sinceTimestamp ORDER BY endTime DESC")
+    suspend fun getSessionsSince(sinceTimestamp: Long): List<PlaySessionEntity>
+
+    @Query("SELECT * FROM play_sessions ORDER BY endTime DESC LIMIT 1")
+    suspend fun getLastSession(): PlaySessionEntity?
 }

@@ -57,6 +57,12 @@ class MainActivity : ComponentActivity() {
         if (openGameId != -1L) {
             viewModel.selectGame(openGameId)
         }
+        com.example.widget.GameTrackerWidgetProvider.updateAllWidgets(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        com.example.widget.GameTrackerWidgetProvider.updateAllWidgets(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
