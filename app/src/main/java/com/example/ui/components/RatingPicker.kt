@@ -15,25 +15,20 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ui.theme.GamePalPrimary
 import com.example.ui.theme.RatingGold
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -69,7 +64,7 @@ fun RatingPicker(
                     imageVector = Icons.Default.Star,
                     contentDescription = null,
                     tint = if (ratingValue > 0) RatingGold else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
@@ -83,19 +78,16 @@ fun RatingPicker(
             if (ratingValue > 0) {
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(
-                            Brush.horizontalGradient(
-                                listOf(GamePalPrimary, Color(0xFF8B5CF6))
-                            )
-                        )
-                        .padding(horizontal = 10.dp, vertical = 4.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(Color(0xFF27272A))
+                        .border(1.dp, Color(0x33FFFFFF), RoundedCornerShape(4.dp))
+                        .padding(horizontal = 8.dp, vertical = 3.dp)
                 ) {
                     Text(
                         text = "$ratingValue / 10",
                         color = Color.White,
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 13.sp
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 12.sp
                     )
                 }
             } else {
@@ -115,19 +107,20 @@ fun RatingPicker(
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
+            val itemShape = RoundedCornerShape(6.dp)
             for (score in 1..10) {
                 val isSelected = currentRating == score
                 Box(
                     modifier = Modifier
-                        .size(34.dp)
-                        .clip(CircleShape)
+                        .size(32.dp)
+                        .clip(itemShape)
                         .background(
-                            if (isSelected) RatingGold else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
+                            if (isSelected) Color.White else Color(0xFF18181B)
                         )
                         .border(
-                            width = if (isSelected) 1.5.dp else 1.dp,
-                            color = if (isSelected) Color.White else MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
-                            shape = CircleShape
+                            width = 1.dp,
+                            color = if (isSelected) Color.White else Color(0xFF27272A),
+                            shape = itemShape
                         )
                         .clickable {
                             if (isSelected) {
@@ -141,8 +134,8 @@ fun RatingPicker(
                     Text(
                         text = "$score",
                         fontWeight = if (isSelected) FontWeight.Black else FontWeight.Medium,
-                        color = if (isSelected) Color(0xFF0F172A) else MaterialTheme.colorScheme.onSurface,
-                        fontSize = 13.sp
+                        color = if (isSelected) Color.Black else Color(0xFFA1A1AA),
+                        fontSize = 12.sp
                     )
                 }
             }

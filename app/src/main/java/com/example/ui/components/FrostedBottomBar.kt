@@ -1,6 +1,5 @@
 package com.example.ui.components
 
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
@@ -8,7 +7,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -21,7 +19,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -30,7 +27,6 @@ import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.SportsEsports
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -46,9 +42,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ui.theme.GamePalPrimary
-import com.example.ui.theme.GamePalSecondary
-import com.example.ui.theme.glassCard
 
 enum class MainNavTab(
     val title: String,
@@ -67,6 +60,8 @@ fun FrostedBottomBar(
     modifier: Modifier = Modifier,
     isDark: Boolean = true
 ) {
+    val barShape = RoundedCornerShape(14.dp)
+
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -74,33 +69,32 @@ fun FrostedBottomBar(
                 Brush.verticalGradient(
                     colors = listOf(
                         Color.Transparent,
-                        Color(0x550F1117),
-                        Color(0xB30F1117),
-                        Color(0xEE0F1117),
-                        Color(0xFF0F1117)
+                        Color(0x7709090B),
+                        Color(0xD909090B),
+                        Color(0xFF09090B)
                     )
                 )
             )
             .windowInsetsPadding(WindowInsets.navigationBars)
-            .padding(start = 20.dp, end = 20.dp, top = 22.dp, bottom = 12.dp),
+            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 10.dp),
         contentAlignment = Alignment.Center
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .shadow(
-                    elevation = 16.dp,
-                    shape = RoundedCornerShape(26.dp),
-                    spotColor = Color(0x99000000),
-                    ambientColor = Color(0x44000000)
+                    elevation = 12.dp,
+                    shape = barShape,
+                    spotColor = Color(0xCC000000),
+                    ambientColor = Color(0x66000000)
                 )
-                .clip(RoundedCornerShape(26.dp))
+                .clip(barShape)
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
-                            Color(0xF01E2433), // Top specular frosted glass
-                            Color(0xF5141824), // Mid body
-                            Color(0xF90F111A)  // Bottom depth
+                            Color(0xF518181D), // Top specular matte
+                            Color(0xF8121215), // Mid body
+                            Color(0xFF09090B)  // Bottom depth
                         )
                     )
                 )
@@ -108,13 +102,13 @@ fun FrostedBottomBar(
                     width = 1.dp,
                     brush = Brush.verticalGradient(
                         colors = listOf(
-                            Color(0x40FFFFFF), // Crisp top highlight
+                            Color(0x33FFFFFF), // Crisp top highlight
                             Color(0x10FFFFFF)  // Subtle bottom rim
                         )
                     ),
-                    shape = RoundedCornerShape(26.dp)
+                    shape = barShape
                 )
-                .padding(horizontal = 10.dp, vertical = 8.dp)
+                .padding(horizontal = 8.dp, vertical = 6.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -130,18 +124,13 @@ fun FrostedBottomBar(
                     modifier = Modifier.weight(1f)
                 )
 
-                // Middle Action: Quick Add Game Button
+                // Middle Action: Modern Industrial Add Button (Crisp White Squircle)
                 Box(
                     modifier = Modifier
-                        .padding(horizontal = 6.dp)
-                        .size(46.dp)
-                        .shadow(8.dp, CircleShape, spotColor = GamePalPrimary)
-                        .clip(CircleShape)
-                        .background(
-                            Brush.linearGradient(
-                                listOf(GamePalPrimary, GamePalSecondary)
-                            )
-                        )
+                        .padding(horizontal = 8.dp)
+                        .size(42.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(Color.White)
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
@@ -153,8 +142,8 @@ fun FrostedBottomBar(
                     Icon(
                         imageVector = Icons.Default.Add,
                         contentDescription = "Přidat hru",
-                        tint = Color.White,
-                        modifier = Modifier.size(24.dp)
+                        tint = Color.Black,
+                        modifier = Modifier.size(22.dp)
                     )
                 }
 
@@ -179,30 +168,31 @@ private fun NavTabItem(
     isDark: Boolean,
     modifier: Modifier = Modifier
 ) {
+    val tabShape = RoundedCornerShape(8.dp)
     val pillBg = if (isSelected) {
-        if (isDark) Color(0x286366F1) else Color(0x1F4F46E5)
+        if (isDark) Color(0x1FFFFFFF) else Color(0x14000000)
     } else Color.Transparent
 
-    val iconTint = if (isSelected) GamePalPrimary else {
-        if (isDark) Color(0xFF94A3B8) else Color(0xFF64748B)
+    val iconTint = if (isSelected) Color.White else {
+        if (isDark) Color(0xFF71717A) else Color(0xFF71717A)
     }
 
     val textColor = if (isSelected) {
-        if (isDark) Color(0xFFF1F5F9) else Color(0xFF1E293B)
+        if (isDark) Color.White else Color(0xFF09090B)
     } else {
-        if (isDark) Color(0xFF64748B) else Color(0xFF94A3B8)
+        if (isDark) Color(0xFF71717A) else Color(0xFF71717A)
     }
 
     val pillPaddingHorizontal by animateDpAsState(
-        targetValue = if (isSelected) 14.dp else 8.dp,
+        targetValue = if (isSelected) 12.dp else 6.dp,
         animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
         label = "PillPadding"
     )
 
     Box(
         modifier = modifier
-            .height(48.dp)
-            .clip(RoundedCornerShape(20.dp))
+            .height(44.dp)
+            .clip(tabShape)
             .background(pillBg)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
@@ -221,7 +211,7 @@ private fun NavTabItem(
                 imageVector = if (isSelected) tab.selectedIcon else tab.unselectedIcon,
                 contentDescription = tab.title,
                 tint = iconTint,
-                modifier = Modifier.size(22.dp)
+                modifier = Modifier.size(20.dp)
             )
 
             Spacer(modifier = Modifier.width(6.dp))

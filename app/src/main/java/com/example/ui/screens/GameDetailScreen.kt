@@ -3,6 +3,7 @@ package com.example.ui.screens
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -172,7 +173,7 @@ fun GameDetailScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .glassCard(shape = RoundedCornerShape(24.dp), accentBorder = isTrackingThisGame)
+                        .glassCard(shape = RoundedCornerShape(12.dp), accentBorder = isTrackingThisGame)
                         .padding(16.dp)
                 ) {
                     Row(
@@ -186,7 +187,7 @@ fun GameDetailScreen(
                             modifier = Modifier
                                 .width(115.dp)
                                 .height(160.dp),
-                            cornerRadius = 16
+                            cornerRadius = 8
                         )
 
                         // Info Column
@@ -268,9 +269,9 @@ fun GameDetailScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .glassCard(
-                            shape = RoundedCornerShape(22.dp),
+                            shape = RoundedCornerShape(12.dp),
                             accentBorder = true,
-                            customTint = if (isTrackingThisGame) Color(0xFF06B6D4) else null
+                            customTint = if (isTrackingThisGame) Color(0xFF27272A) else null
                         )
                         .padding(18.dp)
                 ) {
@@ -368,7 +369,7 @@ fun GameDetailScreen(
                                         containerColor = if (activeSession?.isPaused == true) Color(0xFF10B981) else Color(0xFFF59E0B),
                                         contentColor = Color.White
                                     ),
-                                    shape = RoundedCornerShape(14.dp)
+                                    shape = RoundedCornerShape(8.dp)
                                 ) {
                                     Icon(
                                         imageVector = if (activeSession?.isPaused == true) Icons.Default.PlayArrow else Icons.Default.Pause,
@@ -385,7 +386,7 @@ fun GameDetailScreen(
                                         containerColor = Color(0xFFEF4444),
                                         contentColor = Color.White
                                     ),
-                                    shape = RoundedCornerShape(14.dp)
+                                    shape = RoundedCornerShape(8.dp)
                                 ) {
                                     Icon(Icons.Default.Stop, contentDescription = null)
                                     Spacer(modifier = Modifier.width(6.dp))
@@ -399,10 +400,10 @@ fun GameDetailScreen(
                                     .fillMaxWidth()
                                     .height(48.dp),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = GamePalPrimary,
-                                    contentColor = Color.White
+                                    containerColor = Color.White,
+                                    contentColor = Color.Black
                                 ),
-                                shape = RoundedCornerShape(16.dp)
+                                shape = RoundedCornerShape(8.dp)
                             ) {
                                 Icon(Icons.Default.PlayArrow, contentDescription = null)
                                 Spacer(modifier = Modifier.width(8.dp))
@@ -418,7 +419,7 @@ fun GameDetailScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .glassCard(shape = RoundedCornerShape(20.dp))
+                        .glassCard(shape = RoundedCornerShape(12.dp))
                         .padding(16.dp)
                 ) {
                     RatingPicker(
@@ -441,7 +442,7 @@ fun GameDetailScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .glassCard(shape = RoundedCornerShape(20.dp))
+                            .glassCard(shape = RoundedCornerShape(12.dp))
                             .padding(16.dp)
                     ) {
                         Column {
@@ -477,7 +478,7 @@ fun GameDetailScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .glassCard(shape = RoundedCornerShape(20.dp))
+                        .glassCard(shape = RoundedCornerShape(12.dp))
                         .padding(16.dp)
                 ) {
                     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
@@ -496,7 +497,7 @@ fun GameDetailScreen(
                             modifier = Modifier.fillMaxWidth(),
                             minLines = 3,
                             maxLines = 6,
-                            shape = RoundedCornerShape(14.dp)
+                            shape = RoundedCornerShape(8.dp)
                         )
 
                         OutlinedTextField(
@@ -507,7 +508,7 @@ fun GameDetailScreen(
                             modifier = Modifier.fillMaxWidth(),
                             minLines = 2,
                             maxLines = 5,
-                            shape = RoundedCornerShape(14.dp)
+                            shape = RoundedCornerShape(8.dp)
                         )
 
                         Button(
@@ -520,8 +521,11 @@ fun GameDetailScreen(
                                 )
                             },
                             modifier = Modifier.align(Alignment.End),
-                            colors = ButtonDefaults.buttonColors(containerColor = GamePalPrimary),
-                            shape = RoundedCornerShape(12.dp)
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.White,
+                                contentColor = Color.Black
+                            ),
+                            shape = RoundedCornerShape(8.dp)
                         ) {
                             Text("Uložit texty")
                         }
@@ -534,7 +538,7 @@ fun GameDetailScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .glassCard(shape = RoundedCornerShape(20.dp))
+                        .glassCard(shape = RoundedCornerShape(12.dp))
                         .padding(16.dp)
                 ) {
                     Column {
@@ -573,7 +577,7 @@ fun GameDetailScreen(
                                     Row(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .clip(RoundedCornerShape(10.dp))
+                                            .clip(RoundedCornerShape(8.dp))
                                             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
                                             .padding(10.dp),
                                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -639,9 +643,13 @@ fun GameDetailScreen(
                         sessionNotesInput = ""
                         showStopSessionDialog = false
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = GamePalPrimary)
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.White,
+                        contentColor = Color.Black
+                    ),
+                    shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text("Uložit do historie")
+                    Text("Uložit do historie", fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
@@ -665,18 +673,24 @@ fun GameDetailScreen(
                     Spacer(modifier = Modifier.height(10.dp))
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         listOf(15, 30, 60, 120, 300).forEach { mins ->
+                            val isSel = addMinutesValue == mins.toString()
                             Box(
                                 modifier = Modifier
-                                    .clip(RoundedCornerShape(8.dp))
+                                    .clip(RoundedCornerShape(6.dp))
                                     .background(
-                                        if (addMinutesValue == mins.toString()) GamePalPrimary else MaterialTheme.colorScheme.surfaceVariant
+                                        if (isSel) Color.White else Color(0xFF18181B)
+                                    )
+                                    .border(
+                                        1.dp,
+                                        if (isSel) Color.White else Color(0xFF27272A),
+                                        RoundedCornerShape(6.dp)
                                     )
                                     .clickable { addMinutesValue = mins.toString() }
                                     .padding(horizontal = 10.dp, vertical = 6.dp)
                             ) {
                                 Text(
                                     text = if (mins >= 60) "${mins / 60}h" else "${mins}m",
-                                    color = if (addMinutesValue == mins.toString()) Color.White else MaterialTheme.colorScheme.onSurface,
+                                    color = if (isSel) Color.Black else Color(0xFFA1A1AA),
                                     fontWeight = FontWeight.Bold
                                 )
                             }
@@ -687,7 +701,8 @@ fun GameDetailScreen(
                         value = addMinutesValue,
                         onValueChange = { addMinutesValue = it },
                         label = { Text("Vlastní počet minut") },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(8.dp)
                     )
                 }
             },
@@ -699,9 +714,14 @@ fun GameDetailScreen(
                             viewModel.addManualTime(game.id, mins)
                         }
                         showManualTimeDialog = false
-                    }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.White,
+                        contentColor = Color.Black
+                    ),
+                    shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text("Přičíst čas")
+                    Text("Přičíst čas", fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {

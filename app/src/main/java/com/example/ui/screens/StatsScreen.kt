@@ -418,7 +418,7 @@ private fun HeroStatCard(
 ) {
     Box(
         modifier = modifier
-            .glassCard(shape = RoundedCornerShape(20.dp), isDark = isDark)
+            .glassCard(shape = RoundedCornerShape(12.dp), isDark = isDark)
             .padding(14.dp)
     ) {
         Column {
@@ -436,8 +436,8 @@ private fun HeroStatCard(
                 Box(
                     modifier = Modifier
                         .size(28.dp)
-                        .clip(CircleShape)
-                        .background(iconColor.copy(alpha = if (isDark) 0.20f else 0.12f)),
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(iconColor.copy(alpha = if (isDark) 0.18f else 0.12f)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -480,7 +480,7 @@ private fun MostPlayedSpotlightCard(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .glassCard(shape = RoundedCornerShape(22.dp), isDark = isDark, accentBorder = true)
+            .glassCard(shape = RoundedCornerShape(12.dp), isDark = isDark, accentBorder = true)
             .clickable(onClick = onClick)
             .padding(14.dp)
     ) {
@@ -492,7 +492,7 @@ private fun MostPlayedSpotlightCard(
                 coverUrl = game.coverUrl,
                 contentDescription = game.title,
                 modifier = Modifier.size(width = 54.dp, height = 72.dp),
-                cornerRadius = 10
+                cornerRadius = 8
             )
 
             Spacer(modifier = Modifier.width(14.dp))
@@ -504,15 +504,15 @@ private fun MostPlayedSpotlightCard(
                 ) {
                     Box(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(6.dp))
-                            .background(GamePalPrimary.copy(alpha = 0.2f))
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(Color(0xFF27272A))
                             .padding(horizontal = 6.dp, vertical = 2.dp)
                     ) {
                         Text(
                             text = "👑 NEJHRANĚJŠÍ TITUL",
                             fontSize = 9.sp,
                             fontWeight = FontWeight.Black,
-                            color = GamePalPrimary
+                            color = Color.White
                         )
                     }
                     PlatformBadge(platformName = game.platform, compact = true)
@@ -580,7 +580,7 @@ private fun GenreBreakdownCard(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .glassCard(shape = RoundedCornerShape(22.dp), isDark = isDark)
+            .glassCard(shape = RoundedCornerShape(12.dp), isDark = isDark)
             .padding(18.dp)
     ) {
         Column {
@@ -784,7 +784,7 @@ private fun PlatformBreakdownCard(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .glassCard(shape = RoundedCornerShape(22.dp), isDark = isDark)
+            .glassCard(shape = RoundedCornerShape(12.dp), isDark = isDark)
             .padding(18.dp)
     ) {
         Column {
@@ -825,7 +825,7 @@ private fun PlatformBreakdownCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(14.dp)
-                    .clip(RoundedCornerShape(7.dp))
+                    .clip(RoundedCornerShape(4.dp))
                     .background(if (isDark) Color(0xFF1E293B) else Color(0xFFE2E8F0))
             ) {
                 Row(modifier = Modifier.fillMaxSize()) {
@@ -854,7 +854,7 @@ private fun PlatformBreakdownCard(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clip(RoundedCornerShape(12.dp))
+                            .clip(RoundedCornerShape(8.dp))
                             .background(if (isDark) Color(0x14FFFFFF) else Color(0x0A000000))
                             .padding(10.dp),
                         verticalAlignment = Alignment.CenterVertically,
@@ -917,7 +917,7 @@ private fun RatingDistributionCard(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .glassCard(shape = RoundedCornerShape(22.dp), isDark = isDark)
+            .glassCard(shape = RoundedCornerShape(12.dp), isDark = isDark)
             .padding(18.dp)
     ) {
         Column {
@@ -1080,7 +1080,7 @@ private fun HallOfFameSection(
                 Box(
                     modifier = Modifier
                         .width(130.dp)
-                        .glassCard(shape = RoundedCornerShape(16.dp), isDark = isDark)
+                        .glassCard(shape = RoundedCornerShape(10.dp), isDark = isDark)
                         .clickable { onGameClick(game.id) }
                         .padding(8.dp)
                 ) {
@@ -1092,7 +1092,7 @@ private fun HallOfFameSection(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(150.dp),
-                                cornerRadius = 10
+                                cornerRadius = 6
                             )
 
                             // Rating Badge
@@ -1100,7 +1100,7 @@ private fun HallOfFameSection(
                                 modifier = Modifier
                                     .align(Alignment.TopEnd)
                                     .padding(4.dp)
-                                    .clip(RoundedCornerShape(8.dp))
+                                    .clip(RoundedCornerShape(4.dp))
                                     .background(RatingGold)
                                     .padding(horizontal = 6.dp, vertical = 2.dp)
                             ) {
@@ -1174,7 +1174,7 @@ private fun StatusBreakdownCard(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .glassCard(shape = RoundedCornerShape(22.dp), isDark = isDark)
+            .glassCard(shape = RoundedCornerShape(12.dp), isDark = isDark)
             .padding(18.dp)
     ) {
         Column {
@@ -1233,7 +1233,7 @@ private fun StatusBreakdownCard(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(14.dp))
+                        .clip(RoundedCornerShape(8.dp))
                         .background(if (isDark) Color(0x14FFFFFF) else Color(0x0A000000))
                         .padding(12.dp)
                 ) {
@@ -1351,7 +1351,7 @@ private fun EmptyStatsView(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .glassCard(shape = RoundedCornerShape(26.dp), isDark = isDark, elevation = 6.dp)
+                .glassCard(shape = RoundedCornerShape(12.dp), isDark = isDark, elevation = 2.dp)
                 .padding(28.dp),
             contentAlignment = Alignment.Center
         ) {
@@ -1361,20 +1361,16 @@ private fun EmptyStatsView(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(72.dp)
-                        .clip(CircleShape)
-                        .background(
-                            Brush.linearGradient(
-                                listOf(GamePalPrimary.copy(alpha = 0.25f), GamePalSecondary.copy(alpha = 0.25f))
-                            )
-                        ),
+                        .size(64.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(Color(0xFF1E1E24)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.BarChart,
                         contentDescription = null,
-                        tint = GamePalPrimary,
-                        modifier = Modifier.size(36.dp)
+                        tint = Color.White,
+                        modifier = Modifier.size(32.dp)
                     )
                 }
 
@@ -1402,10 +1398,10 @@ private fun EmptyStatsView(
                 Button(
                     onClick = onAddGameClick,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = GamePalPrimary,
-                        contentColor = Color.White
+                        containerColor = Color.White,
+                        contentColor = Color.Black
                     ),
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(8.dp),
                     modifier = Modifier.height(48.dp)
                 ) {
                     Icon(

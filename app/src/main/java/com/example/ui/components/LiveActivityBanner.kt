@@ -60,7 +60,7 @@ fun LiveActivityBanner(
                 modifier = modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 6.dp)
-                    .glassCard(shape = RoundedCornerShape(24.dp), accentBorder = true)
+                    .glassCard(shape = RoundedCornerShape(12.dp), accentBorder = true)
                     .clickable { onBannerClick(activeSession.gameId) }
                     .padding(horizontal = 14.dp, vertical = 10.dp)
             ) {
@@ -101,7 +101,7 @@ fun LiveActivityBanner(
                                     text = if (activeSession.isPaused) "POZASTAVENO" else "LIVE TRACKING",
                                     fontSize = 9.sp,
                                     fontWeight = FontWeight.Black,
-                                    color = if (activeSession.isPaused) Color(0xFFF59E0B) else GamePalSecondary,
+                                    color = if (activeSession.isPaused) Color(0xFFF59E0B) else Color(0xFFE4E4E7),
                                     letterSpacing = 0.8.sp
                                 )
                             }
@@ -129,15 +129,8 @@ fun LiveActivityBanner(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(
                             modifier = Modifier
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(
-                                    Brush.horizontalGradient(
-                                        listOf(
-                                            GamePalPrimary.copy(alpha = 0.25f),
-                                            GamePalSecondary.copy(alpha = 0.25f)
-                                        )
-                                    )
-                                )
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(Color(0xFF222228))
                                 .padding(horizontal = 8.dp, vertical = 4.dp)
                         ) {
                             Text(

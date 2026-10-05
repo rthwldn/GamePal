@@ -17,21 +17,22 @@ import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
     primary = GamePalPrimary,
-    onPrimary = Color.White,
-    primaryContainer = Color(0xFF312E81),
-    onPrimaryContainer = Color(0xFFE0E7FF),
+    onPrimary = Color.Black,
+    primaryContainer = Color(0xFF27272A),
+    onPrimaryContainer = Color(0xFFF4F4F5),
     secondary = GamePalSecondary,
     onSecondary = Color.Black,
-    secondaryContainer = Color(0xFF164E63),
-    onSecondaryContainer = Color(0xFFCFFAFE),
+    secondaryContainer = Color(0xFF18181B),
+    onSecondaryContainer = Color(0xFFE4E4E7),
     tertiary = GamePalAccent,
-    onTertiary = Color.White,
+    onTertiary = Color.Black,
     background = DarkBackground,
     onBackground = DarkTextPrimary,
     surface = DarkSurface,
     onSurface = DarkTextPrimary,
-    surfaceVariant = Color(0xFF1F2937),
-    onSurfaceVariant = DarkTextSecondary
+    surfaceVariant = Color(0xFF18181B),
+    onSurfaceVariant = DarkTextSecondary,
+    outline = Color(0xFF27272A)
 )
 
 private val LightColorScheme = lightColorScheme(

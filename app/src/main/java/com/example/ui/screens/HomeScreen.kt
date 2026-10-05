@@ -5,6 +5,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -153,7 +154,7 @@ fun HomeScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .glassCard(shape = RoundedCornerShape(20.dp), isDark = true)
+                        .glassCard(shape = RoundedCornerShape(12.dp), isDark = true)
                         .padding(16.dp)
                 ) {
                     Row(
@@ -164,35 +165,35 @@ fun HomeScreen(
                         StatItem(
                             title = "Celkem her",
                             value = "${stats.totalGames}",
-                            accent = GamePalPrimary
+                            accent = Color.White
                         )
                         Box(
                             modifier = Modifier
                                 .width(1.dp)
                                 .height(32.dp)
-                                .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+                                .background(Color(0xFF27272A))
                         )
                         StatItem(
                             title = "Odehráno",
                             value = stats.totalHours,
-                            accent = GamePalSecondary
+                            accent = Color(0xFFD4D4D8)
                         )
                         Box(
                             modifier = Modifier
                                 .width(1.dp)
                                 .height(32.dp)
-                                .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+                                .background(Color(0xFF27272A))
                         )
                         StatItem(
                             title = "Dohráno",
                             value = "${stats.completedGames}",
-                            accent = Color(0xFF10B981)
+                            accent = Color(0xFFA1A1AA)
                         )
                         Box(
                             modifier = Modifier
                                 .width(1.dp)
                                 .height(32.dp)
-                                .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+                                .background(Color(0xFF27272A))
                         )
                         StatItem(
                             title = "Průměr",
@@ -216,7 +217,7 @@ fun HomeScreen(
                         Icon(
                             imageVector = Icons.Default.Search,
                             contentDescription = "Hledat",
-                            tint = GamePalPrimary
+                            tint = Color.White
                         )
                     },
                     trailingIcon = {
@@ -226,12 +227,12 @@ fun HomeScreen(
                             }
                         }
                     },
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(8.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = GamePalPrimary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
-                        focusedContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f),
-                        unfocusedContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.35f)
+                        focusedBorderColor = Color.White,
+                        unfocusedBorderColor = Color(0xFF27272A),
+                        focusedContainerColor = Color(0xFF141417),
+                        unfocusedContainerColor = Color(0xFF101013)
                     ),
                     singleLine = true
                 )
@@ -407,12 +408,15 @@ fun HomeScreen(
                             Spacer(modifier = Modifier.height(16.dp))
                             Button(
                                 onClick = onOpenAddGame,
-                                colors = ButtonDefaults.buttonColors(containerColor = GamePalPrimary),
-                                shape = RoundedCornerShape(14.dp)
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.White,
+                                    contentColor = Color.Black
+                                ),
+                                shape = RoundedCornerShape(8.dp)
                             ) {
                                 Icon(Icons.Default.Add, contentDescription = null)
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text("Přidat hru")
+                                Text("Přidat hru", fontWeight = FontWeight.Bold)
                             }
                         }
                     }
@@ -458,18 +462,23 @@ fun FilterChipPill(
 ) {
     Box(
         modifier = Modifier
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(6.dp))
             .background(
-                if (isSelected) activeColor else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                if (isSelected) Color.White else Color(0xFF18181B)
+            )
+            .border(
+                1.dp,
+                if (isSelected) Color.White else Color(0xFF27272A),
+                RoundedCornerShape(6.dp)
             )
             .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 6.dp)
+            .padding(horizontal = 10.dp, vertical = 5.dp)
     ) {
         Text(
             text = label,
             fontSize = 12.sp,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-            color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface
+            color = if (isSelected) Color.Black else Color(0xFFA1A1AA)
         )
     }
 }
@@ -489,10 +498,10 @@ fun GameCard(
         modifier = modifier
             .fillMaxWidth()
             .glassCard(
-                shape = RoundedCornerShape(18.dp),
+                shape = RoundedCornerShape(12.dp),
                 isDark = isDark,
                 accentBorder = isTracking,
-                customTint = if (isTracking) Color(0xFF06B6D4) else null
+                customTint = if (isTracking) Color(0xFF27272A) else null
             )
             .clickable(onClick = onClick)
             .padding(10.dp)
@@ -508,7 +517,7 @@ fun GameCard(
                     coverUrl = game.coverUrl,
                     contentDescription = game.title,
                     modifier = Modifier.fillMaxSize(),
-                    cornerRadius = 14
+                    cornerRadius = 8
                 )
 
                 // Top Left: Rating Score Star Badge
@@ -517,8 +526,8 @@ fun GameCard(
                         modifier = Modifier
                             .align(Alignment.TopStart)
                             .padding(6.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(Color(0xE60F172A))
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(Color(0xE609090B))
                             .padding(horizontal = 6.dp, vertical = 3.dp)
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -544,7 +553,7 @@ fun GameCard(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(6.dp)
-                        .clip(RoundedCornerShape(8.dp))
+                        .clip(RoundedCornerShape(4.dp))
                         .background(status.primaryColor.copy(alpha = 0.9f))
                         .padding(horizontal = 6.dp, vertical = 2.dp)
                 ) {
@@ -563,15 +572,15 @@ fun GameCard(
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
                             .padding(6.dp)
-                            .size(32.dp)
-                            .clip(CircleShape)
-                            .background(GamePalPrimary.copy(alpha = 0.9f))
+                            .size(30.dp)
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(Color.White)
                     ) {
                         Icon(
                             imageVector = Icons.Default.PlayArrow,
                             contentDescription = "Spustit měření",
-                            tint = Color.White,
-                            modifier = Modifier.size(18.dp)
+                            tint = Color.Black,
+                            modifier = Modifier.size(16.dp)
                         )
                     }
                 }

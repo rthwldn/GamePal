@@ -2,7 +2,6 @@ package com.example.ui.theme
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -18,27 +17,27 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun Modifier.glassCard(
-    shape: Shape = RoundedCornerShape(20.dp),
+    shape: Shape = RoundedCornerShape(12.dp),
     isDark: Boolean = true,
-    elevation: Dp = if (isDark) 0.dp else 4.dp,
+    elevation: Dp = if (isDark) 0.dp else 2.dp,
     accentBorder: Boolean = false,
     customTint: Color? = null
 ): Modifier {
     val backgroundBrush = if (isDark) {
-        val baseColor = customTint ?: Color(0xFF161B26)
+        val baseColor = customTint ?: Color(0xFF131316)
         Brush.verticalGradient(
             colors = listOf(
-                (customTint?.copy(alpha = 0.35f) ?: Color(0x1FFFFFFF)), // Top specular shine
-                (customTint?.copy(alpha = 0.20f) ?: Color(0x0CFFFFFF)), // Mid body
-                Color(0x140F1117) // Bottom shadow blend
+                (customTint?.copy(alpha = 0.25f) ?: Color(0xFF1A1A1E)), // Subtle top specular shine
+                (customTint?.copy(alpha = 0.15f) ?: Color(0xFF131316)), // Mid body
+                Color(0xFF0D0D10)                                         // Bottom subtle depth
             )
         )
     } else {
         val baseColor = customTint ?: Color.White
         Brush.verticalGradient(
             colors = listOf(
-                baseColor.copy(alpha = 0.90f),
-                Color(0xFFF8FAFC).copy(alpha = 0.75f)
+                baseColor.copy(alpha = 0.95f),
+                Color(0xFFF4F4F5).copy(alpha = 0.85f)
             )
         )
     }
@@ -46,16 +45,16 @@ fun Modifier.glassCard(
     val borderBrush = if (accentBorder) {
         Brush.linearGradient(
             colors = listOf(
-                GamePalPrimary.copy(alpha = 0.7f),
-                GamePalSecondary.copy(alpha = 0.5f),
-                Color.White.copy(alpha = if (isDark) 0.2f else 0.5f)
+                Color.White.copy(alpha = 0.70f),
+                Color(0xFFA1A1AA).copy(alpha = 0.40f),
+                Color.White.copy(alpha = if (isDark) 0.15f else 0.35f)
             )
         )
     } else {
         Brush.verticalGradient(
             colors = listOf(
-                Color.White.copy(alpha = if (isDark) 0.28f else 0.85f), // Crisp top highlight rim
-                Color.White.copy(alpha = if (isDark) 0.08f else 0.30f)  // Soft bottom edge
+                Color.White.copy(alpha = if (isDark) 0.20f else 0.85f), // Crisp top hairline rim
+                Color.White.copy(alpha = if (isDark) 0.06f else 0.25f)  // Soft bottom rim
             )
         )
     }
@@ -66,8 +65,8 @@ fun Modifier.glassCard(
                 Modifier.shadow(
                     elevation = elevation,
                     shape = shape,
-                    spotColor = Color(0x1A0F172A),
-                    ambientColor = Color(0x0D0F172A)
+                    spotColor = Color(0x1A09090B),
+                    ambientColor = Color(0x0D09090B)
                 )
             } else Modifier
         )
@@ -78,17 +77,17 @@ fun Modifier.glassCard(
 
 @Composable
 fun Modifier.glassPill(
-    shape: Shape = RoundedCornerShape(50),
+    shape: Shape = RoundedCornerShape(8.dp),
     isDark: Boolean = true,
     accentBorder: Boolean = false,
     customTint: Color? = null
 ): Modifier {
     val backgroundBrush = if (isDark) {
-        val baseColor = customTint ?: Color(0x1AFFFFFF)
+        val baseColor = customTint ?: Color(0xFF1E1E23)
         Brush.verticalGradient(
             colors = listOf(
-                baseColor.copy(alpha = 0.25f),
-                baseColor.copy(alpha = 0.10f)
+                baseColor.copy(alpha = 0.35f),
+                baseColor.copy(alpha = 0.18f)
             )
         )
     } else {
@@ -96,18 +95,21 @@ fun Modifier.glassPill(
         Brush.verticalGradient(
             colors = listOf(
                 baseColor.copy(alpha = 0.95f),
-                Color(0xFFF1F5F9).copy(alpha = 0.80f)
+                Color(0xFFF4F4F5).copy(alpha = 0.85f)
             )
         )
     }
 
     val borderBrush = if (accentBorder) {
         Brush.horizontalGradient(
-            listOf(GamePalPrimary.copy(alpha = 0.8f), GamePalSecondary.copy(alpha = 0.6f))
+            listOf(Color.White.copy(alpha = 0.8f), Color(0xFFA1A1AA).copy(alpha = 0.5f))
         )
     } else {
         Brush.verticalGradient(
-            listOf(Color.White.copy(alpha = if (isDark) 0.35f else 0.8f), Color.White.copy(alpha = if (isDark) 0.10f else 0.2f))
+            listOf(
+                Color.White.copy(alpha = if (isDark) 0.25f else 0.8f),
+                Color.White.copy(alpha = if (isDark) 0.08f else 0.2f)
+            )
         )
     }
 
@@ -124,73 +126,31 @@ fun Modifier.auroraBackground(isDark: Boolean = true): Modifier {
         val canvasHeight = size.height
 
         if (isDark) {
-            // Dark Frosted Glass obsidian backdrop (#0F1117) with luminous ambient orbs
-            drawRect(color = Color(0xFF0F1117))
+            // Sleek, deep matte obsidian black canvas (#09090B) without neon saturation
+            drawRect(color = Color(0xFF09090B))
 
-            // Upper left indigo bloom
+            // Very subtle, elegant top ambient illumination (monochrome soft white light)
             drawCircle(
                 brush = Brush.radialGradient(
-                    colors = listOf(Color(0x386366F1), Color.Transparent),
-                    center = Offset(canvasWidth * 0.15f, canvasHeight * 0.08f),
-                    radius = canvasWidth * 0.75f
+                    colors = listOf(Color(0x0AFFFFFF), Color.Transparent),
+                    center = Offset(canvasWidth * 0.5f, 0f),
+                    radius = canvasWidth * 0.9f
                 ),
-                radius = canvasWidth * 0.75f,
-                center = Offset(canvasWidth * 0.15f, canvasHeight * 0.08f)
-            )
-
-            // Right side cyan flare
-            drawCircle(
-                brush = Brush.radialGradient(
-                    colors = listOf(Color(0x2E06B6D4), Color.Transparent),
-                    center = Offset(canvasWidth * 0.90f, canvasHeight * 0.32f),
-                    radius = canvasWidth * 0.65f
-                ),
-                radius = canvasWidth * 0.65f,
-                center = Offset(canvasWidth * 0.90f, canvasHeight * 0.32f)
-            )
-
-            // Lower violet glow
-            drawCircle(
-                brush = Brush.radialGradient(
-                    colors = listOf(Color(0x288B5CF6), Color.Transparent),
-                    center = Offset(canvasWidth * 0.35f, canvasHeight * 0.78f),
-                    radius = canvasWidth * 0.80f
-                ),
-                radius = canvasWidth * 0.80f,
-                center = Offset(canvasWidth * 0.35f, canvasHeight * 0.78f)
+                radius = canvasWidth * 0.9f,
+                center = Offset(canvasWidth * 0.5f, 0f)
             )
         } else {
-            // Light frosted canvas with soft pastel glow
-            drawRect(color = Color(0xFFF1F5F9))
+            // Light minimalist canvas
+            drawRect(color = Color(0xFFF4F4F5))
 
             drawCircle(
                 brush = Brush.radialGradient(
-                    colors = listOf(Color(0x35C7D2FE), Color.Transparent),
-                    center = Offset(canvasWidth * 0.2f, canvasHeight * 0.1f),
-                    radius = canvasWidth * 0.8f
+                    colors = listOf(Color(0x08000000), Color.Transparent),
+                    center = Offset(canvasWidth * 0.5f, 0f),
+                    radius = canvasWidth * 0.9f
                 ),
-                radius = canvasWidth * 0.8f,
-                center = Offset(canvasWidth * 0.2f, canvasHeight * 0.1f)
-            )
-
-            drawCircle(
-                brush = Brush.radialGradient(
-                    colors = listOf(Color(0x28BAE6FD), Color.Transparent),
-                    center = Offset(canvasWidth * 0.8f, canvasHeight * 0.4f),
-                    radius = canvasWidth * 0.7f
-                ),
-                radius = canvasWidth * 0.7f,
-                center = Offset(canvasWidth * 0.8f, canvasHeight * 0.4f)
-            )
-
-            drawCircle(
-                brush = Brush.radialGradient(
-                    colors = listOf(Color(0x25DDD6FE), Color.Transparent),
-                    center = Offset(canvasWidth * 0.5f, canvasHeight * 0.85f),
-                    radius = canvasWidth * 0.8f
-                ),
-                radius = canvasWidth * 0.8f,
-                center = Offset(canvasWidth * 0.5f, canvasHeight * 0.85f)
+                radius = canvasWidth * 0.9f,
+                center = Offset(canvasWidth * 0.5f, 0f)
             )
         }
     }

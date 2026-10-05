@@ -98,9 +98,9 @@ fun AddGameDialog(
     var isCustomEditMode by remember { mutableStateOf(false) }
     var showPlatformDropdown by remember { mutableStateOf(false) }
 
-    val containerBg = if (isDark) Color(0xF7131722) else Color(0xFAFFFFFF)
-    val inputBg = if (isDark) Color(0xFF1C2232) else Color(0xFFF1F5F9)
-    val inputBorder = if (isDark) Color(0x33FFFFFF) else Color(0x22000000)
+    val containerBg = if (isDark) Color(0xF7101014) else Color(0xFAFFFFFF)
+    val inputBg = if (isDark) Color(0xFF141417) else Color(0xFFF1F5F9)
+    val inputBorder = if (isDark) Color(0xFF27272A) else Color(0xFFE4E4E7)
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -109,7 +109,7 @@ fun AddGameDialog(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(if (isDark) Color(0x99000000) else Color(0x77000000))
+                .background(if (isDark) Color(0xCC000000) else Color(0x77000000))
                 .clickable(onClick = onDismiss)
                 .padding(14.dp),
             contentAlignment = Alignment.Center
@@ -119,17 +119,17 @@ fun AddGameDialog(
                     .fillMaxWidth()
                     .fillMaxSize(0.96f)
                     .clickable(enabled = false) {}
-                    .clip(RoundedCornerShape(24.dp))
+                    .clip(RoundedCornerShape(14.dp))
                     .border(
                         width = 1.dp,
                         brush = Brush.verticalGradient(
-                            if (isDark) listOf(Color(0x40FFFFFF), Color(0x15FFFFFF))
+                            if (isDark) listOf(Color(0x35FFFFFF), Color(0x10FFFFFF))
                             else listOf(Color(0x30000000), Color(0x10000000))
                         ),
-                        shape = RoundedCornerShape(24.dp)
+                        shape = RoundedCornerShape(14.dp)
                     ),
                 color = containerBg,
-                shape = RoundedCornerShape(24.dp),
+                shape = RoundedCornerShape(14.dp),
                 shadowElevation = 16.dp
             ) {
                 Column(
@@ -196,9 +196,9 @@ fun AddGameDialog(
                                 )
                             }
                         },
-                        shape = RoundedCornerShape(16.dp),
+                        shape = RoundedCornerShape(8.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = GamePalPrimary,
+                            focusedBorderColor = Color.White,
                             unfocusedBorderColor = inputBorder,
                             focusedContainerColor = inputBg,
                             unfocusedContainerColor = inputBg,
@@ -232,12 +232,12 @@ fun AddGameDialog(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(vertical = 4.dp)
-                                        .clip(RoundedCornerShape(16.dp))
-                                        .background(if (isDark) Color(0xFF1B2232) else Color(0xFFF1F5F9))
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(if (isDark) Color(0xFF141418) else Color(0xFFF1F5F9))
                                         .border(
                                             width = 1.dp,
-                                            color = if (isDark) Color(0x22FFFFFF) else Color(0x15000000),
-                                            shape = RoundedCornerShape(16.dp)
+                                            color = if (isDark) Color(0xFF27272A) else Color(0x15000000),
+                                            shape = RoundedCornerShape(8.dp)
                                         )
                                         .clickable {
                                             selectedTitle = result.title
@@ -313,9 +313,9 @@ fun AddGameDialog(
                                         onValueChange = { selectedTitle = it },
                                         label = { Text("Název hry *") },
                                         modifier = Modifier.fillMaxWidth(),
-                                        shape = RoundedCornerShape(14.dp),
+                                        shape = RoundedCornerShape(8.dp),
                                         colors = OutlinedTextFieldDefaults.colors(
-                                            focusedBorderColor = GamePalPrimary,
+                                            focusedBorderColor = Color.White,
                                             unfocusedBorderColor = inputBorder,
                                             focusedContainerColor = inputBg,
                                             unfocusedContainerColor = inputBg,
@@ -338,9 +338,9 @@ fun AddGameDialog(
                                     Box(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .clip(RoundedCornerShape(14.dp))
+                                            .clip(RoundedCornerShape(8.dp))
                                             .background(inputBg)
-                                            .border(1.dp, inputBorder, RoundedCornerShape(14.dp))
+                                            .border(1.dp, inputBorder, RoundedCornerShape(8.dp))
                                             .clickable { showPlatformDropdown = true }
                                             .padding(horizontal = 14.dp, vertical = 12.dp)
                                     ) {
@@ -404,9 +404,14 @@ fun AddGameDialog(
                                             val isSel = selectedPlatform.equals(p.name, true)
                                             Box(
                                                 modifier = Modifier
-                                                    .clip(RoundedCornerShape(8.dp))
+                                                    .clip(RoundedCornerShape(6.dp))
                                                     .background(
-                                                        if (isSel) GamePalPrimary else (if (isDark) Color(0xFF242C3E) else Color(0xFFE2E8F0))
+                                                        if (isSel) Color.White else (if (isDark) Color(0xFF1E1E24) else Color(0xFFE2E8F0))
+                                                    )
+                                                    .border(
+                                                        1.dp,
+                                                        if (isSel) Color.White else Color(0xFF27272A),
+                                                        RoundedCornerShape(6.dp)
                                                     )
                                                     .clickable { selectedPlatform = p.name }
                                                     .padding(horizontal = 8.dp, vertical = 4.dp)
@@ -415,7 +420,7 @@ fun AddGameDialog(
                                                     text = p.shortName,
                                                     fontSize = 11.sp,
                                                     fontWeight = if (isSel) FontWeight.Bold else FontWeight.Normal,
-                                                    color = if (isSel) Color.White else MaterialTheme.colorScheme.onSurface
+                                                    color = if (isSel) Color.Black else MaterialTheme.colorScheme.onSurface
                                                 )
                                             }
                                         }
@@ -440,9 +445,14 @@ fun AddGameDialog(
                                             val isSelected = selectedStatus == status.id
                                             Box(
                                                 modifier = Modifier
-                                                    .clip(RoundedCornerShape(10.dp))
+                                                    .clip(RoundedCornerShape(6.dp))
                                                     .background(
-                                                        if (isSelected) status.primaryColor else (if (isDark) Color(0xFF242C3E) else Color(0xFFE2E8F0))
+                                                        if (isSelected) status.primaryColor else (if (isDark) Color(0xFF1E1E24) else Color(0xFFE2E8F0))
+                                                    )
+                                                    .border(
+                                                        1.dp,
+                                                        if (isSelected) status.primaryColor else Color(0xFF27272A),
+                                                        RoundedCornerShape(6.dp)
                                                     )
                                                     .clickable { selectedStatus = status.id }
                                                     .padding(horizontal = 10.dp, vertical = 6.dp)
@@ -475,9 +485,9 @@ fun AddGameDialog(
                                         placeholder = { Text("např. 15") },
                                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                         modifier = Modifier.fillMaxWidth(),
-                                        shape = RoundedCornerShape(14.dp),
+                                        shape = RoundedCornerShape(8.dp),
                                         colors = OutlinedTextFieldDefaults.colors(
-                                            focusedBorderColor = GamePalPrimary,
+                                            focusedBorderColor = Color.White,
                                             unfocusedBorderColor = inputBorder,
                                             focusedContainerColor = inputBg,
                                             unfocusedContainerColor = inputBg,
@@ -496,9 +506,9 @@ fun AddGameDialog(
                                         placeholder = { Text("Váš osobní dojem ze hry...") },
                                         modifier = Modifier.fillMaxWidth(),
                                         maxLines = 3,
-                                        shape = RoundedCornerShape(14.dp),
+                                        shape = RoundedCornerShape(8.dp),
                                         colors = OutlinedTextFieldDefaults.colors(
-                                            focusedBorderColor = GamePalPrimary,
+                                            focusedBorderColor = Color.White,
                                             unfocusedBorderColor = inputBorder,
                                             focusedContainerColor = inputBg,
                                             unfocusedContainerColor = inputBg,
@@ -516,9 +526,9 @@ fun AddGameDialog(
                                         placeholder = { Text("Kde jsem skončil, tipy, build...") },
                                         modifier = Modifier.fillMaxWidth(),
                                         maxLines = 3,
-                                        shape = RoundedCornerShape(14.dp),
+                                        shape = RoundedCornerShape(8.dp),
                                         colors = OutlinedTextFieldDefaults.colors(
-                                            focusedBorderColor = GamePalPrimary,
+                                            focusedBorderColor = Color.White,
                                             unfocusedBorderColor = inputBorder,
                                             focusedContainerColor = inputBg,
                                             unfocusedContainerColor = inputBg,
@@ -536,9 +546,9 @@ fun AddGameDialog(
                                         label = { Text("URL Cover Artu (obrázek)") },
                                         placeholder = { Text("https://...") },
                                         modifier = Modifier.fillMaxWidth(),
-                                        shape = RoundedCornerShape(14.dp),
+                                        shape = RoundedCornerShape(8.dp),
                                         colors = OutlinedTextFieldDefaults.colors(
-                                            focusedBorderColor = GamePalPrimary,
+                                            focusedBorderColor = Color.White,
                                             unfocusedBorderColor = inputBorder,
                                             focusedContainerColor = inputBg,
                                             unfocusedContainerColor = inputBg,
@@ -588,10 +598,12 @@ fun AddGameDialog(
                             },
                             enabled = selectedTitle.isNotBlank(),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = GamePalPrimary,
-                                contentColor = Color.White
+                                containerColor = Color.White,
+                                contentColor = Color.Black,
+                                disabledContainerColor = Color(0xFF27272A),
+                                disabledContentColor = Color(0xFF71717A)
                             ),
-                            shape = RoundedCornerShape(16.dp),
+                            shape = RoundedCornerShape(8.dp),
                             modifier = Modifier.height(48.dp)
                         ) {
                             Text("Uložit do knihovny", fontWeight = FontWeight.Bold)
