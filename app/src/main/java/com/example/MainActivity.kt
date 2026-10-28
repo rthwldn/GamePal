@@ -1,11 +1,13 @@
 package com.example
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
+import androidx.compose.ui.platform.LocalContext
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -17,11 +19,11 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -34,14 +36,19 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import com.example.data.firestore.FirestoreSyncManager
 import com.example.ui.components.FrostedBottomBar
 import com.example.ui.components.MainNavTab
 import com.example.ui.screens.AddGameDialog
+import com.example.ui.screens.AuthScreen
 import com.example.ui.screens.GameDetailScreen
 import com.example.ui.screens.HomeScreen
 import com.example.ui.screens.StatsScreen
 import com.example.ui.theme.MyApplicationTheme
 import com.example.viewmodel.GamePalViewModel
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 
 class MainActivity : ComponentActivity() {
 
@@ -72,6 +79,8 @@ class MainActivity : ComponentActivity() {
             navigationBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
         )
 
+        val app = application as GamePalApplication
+
         // Check if opened from Live Activity notification
         val openGameId = intent.getLongExtra("GAME_ID", -1L)
         if (openGameId != -1L) {
@@ -101,7 +110,10 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = Color.Transparent
                 ) {
-                    GamePalApp(viewModel = viewModel)
+                    AppContent(
+                        viewModel = viewModel,
+                        syncManager = app.syncManager
+                    )
                 }
             }
         }
@@ -109,7 +121,59 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun GamePalApp(viewModel: GamePalViewModel) {
+fun AppContent(
+    viewModel: GamePalViewModel,
+    syncManager: FirestoreSyncManager
+) {
+    val context = LocalContext.current
+    val prefs = remember {
+        context.getSharedPreferences("playpulse_prefs", Context.MODE_PRIVATE)
+    }
+    var hasSkippedAuth by remember {
+        mutableStateOf(prefs.getBoolean("skip_google_sign_in", false))
+    }
+    var currentUser by remember { mutableStateOf(Firebase.auth.currentUser) }
+
+    DisposableEffect(Unit) {
+        val listener = FirebaseAuth.AuthStateListener { auth ->
+            currentUser = auth.currentUser
+        }
+        Firebase.auth.addAuthStateListener(listener)
+        onDispose {
+            Firebase.auth.removeAuthStateListener(listener)
+        }
+    }
+
+    // Trigger cloud synchronization whenever an authenticated session is active
+    LaunchedEffect(currentUser) {
+        if (currentUser != null) {
+            syncManager.syncAll()
+        }
+    }
+
+    if (currentUser == null && !hasSkippedAuth) {
+        AuthScreen(
+            onAuthSuccess = {
+                currentUser = Firebase.auth.currentUser
+            },
+            onContinueWithoutSignIn = {
+                prefs.edit().putBoolean("skip_google_sign_in", true).apply()
+                hasSkippedAuth = true
+            }
+        )
+    } else {
+        GamePalApp(
+            viewModel = viewModel,
+            syncManager = syncManager
+        )
+    }
+}
+
+@Composable
+fun GamePalApp(
+    viewModel: GamePalViewModel,
+    syncManager: FirestoreSyncManager
+) {
     val selectedGame by viewModel.selectedGame.collectAsState()
     var currentTab by remember { mutableStateOf(MainNavTab.HOME) }
     var showAddDialog by remember { mutableStateOf(false) }
@@ -159,6 +223,7 @@ fun GamePalApp(viewModel: GamePalViewModel) {
                             MainNavTab.HOME -> {
                                 HomeScreen(
                                     viewModel = viewModel,
+                                    syncManager = syncManager,
                                     onGameClick = { gameId -> viewModel.selectGame(gameId) },
                                     onOpenAddGame = { showAddDialog = true }
                                 )

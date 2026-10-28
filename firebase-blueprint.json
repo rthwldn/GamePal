@@ -1,0 +1,193 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile holding sync state and metadata",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "User ID matching auth.uid"
+        },
+        "email": {
+          "type": "string",
+          "description": "User email address"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "User display name"
+        },
+        "lastSyncTimestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of the last sync operation"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of creation"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of update"
+        }
+      },
+      "required": ["userId", "createdAt"]
+    },
+    "Game": {
+      "title": "Game",
+      "description": "Game saved in user's library",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the game"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner user ID"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the game"
+        },
+        "platform": {
+          "type": "string",
+          "description": "Gaming platform"
+        },
+        "coverUrl": {
+          "type": "string",
+          "description": "Cover art image URL or path"
+        },
+        "description": {
+          "type": "string",
+          "description": "Game description"
+        },
+        "releaseYear": {
+          "type": "integer",
+          "description": "Release year"
+        },
+        "genres": {
+          "type": "string",
+          "description": "Genres list"
+        },
+        "developer": {
+          "type": "string",
+          "description": "Developer name"
+        },
+        "status": {
+          "type": "string",
+          "description": "Status: playing, completed, dropped, backlog, wishlist"
+        },
+        "rating": {
+          "type": "integer",
+          "description": "User rating 1-10"
+        },
+        "review": {
+          "type": "string",
+          "description": "User review text"
+        },
+        "notes": {
+          "type": "string",
+          "description": "User notes text"
+        },
+        "totalPlayTimeSeconds": {
+          "type": "integer",
+          "description": "Total play time in seconds"
+        },
+        "lastPlayedTimestamp": {
+          "type": "integer",
+          "description": "Last played timestamp in epoch ms"
+        },
+        "addedTimestamp": {
+          "type": "integer",
+          "description": "Timestamp when added in epoch ms"
+        },
+        "isFavorite": {
+          "type": "boolean",
+          "description": "Whether the game is marked as favorite"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of creation"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of update"
+        }
+      },
+      "required": ["id", "userId", "title", "platform", "status", "createdAt"]
+    },
+    "PlaySession": {
+      "title": "PlaySession",
+      "description": "Individual game play session",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique session ID"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner user ID"
+        },
+        "gameId": {
+          "type": "string",
+          "description": "Associated game ID"
+        },
+        "gameTitle": {
+          "type": "string",
+          "description": "Cached game title"
+        },
+        "platform": {
+          "type": "string",
+          "description": "Gaming platform"
+        },
+        "startTime": {
+          "type": "integer",
+          "description": "Start timestamp in epoch ms"
+        },
+        "endTime": {
+          "type": "integer",
+          "description": "End timestamp in epoch ms"
+        },
+        "durationSeconds": {
+          "type": "integer",
+          "description": "Session duration in seconds"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Session notes"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of creation"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of update"
+        }
+      },
+      "required": ["id", "userId", "gameId", "durationSeconds", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "User profile document"
+    },
+    "/users/{userId}/games/{gameId}": {
+      "schema": { "$ref": "#/entities/Game" },
+      "description": "User games library"
+    },
+    "/users/{userId}/sessions/{sessionId}": {
+      "schema": { "$ref": "#/entities/PlaySession" },
+      "description": "User play history sessions"
+    }
+  }
+}

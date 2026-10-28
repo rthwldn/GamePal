@@ -1,0 +1,145 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidUserProfile(data, userId) {
+      return data.userId == userId &&
+        (!('email' in data) || data.email == null || (data.email is string && data.email.size() <= 320)) &&
+        (!('displayName' in data) || data.displayName == null || (data.displayName is string && data.displayName.size() <= 100)) &&
+        (!('lastSyncTimestamp' in data) || data.lastSyncTimestamp == null || data.lastSyncTimestamp is timestamp) &&
+        (!('updatedAt' in data) || data.updatedAt is timestamp);
+    }
+
+    function isValidGame(data, userId) {
+      return data.id is string && data.id.size() > 0 && data.id.size() <= 128 && isValidId(data.id) &&
+        data.userId == userId &&
+        data.title is string && data.title.size() > 0 && data.title.size() <= 200 &&
+        data.platform is string && data.platform.size() > 0 && data.platform.size() <= 100 &&
+        (!('coverUrl' in data) || data.coverUrl == null || (data.coverUrl is string && data.coverUrl.size() <= 2000)) &&
+        (!('description' in data) || data.description == null || (data.description is string && data.description.size() <= 5000)) &&
+        (!('releaseYear' in data) || data.releaseYear == null || data.releaseYear is int) &&
+        (!('genres' in data) || data.genres == null || (data.genres is string && data.genres.size() <= 500)) &&
+        (!('developer' in data) || data.developer == null || (data.developer is string && data.developer.size() <= 200)) &&
+        data.status is string && data.status.size() <= 50 &&
+        (!('rating' in data) || data.rating == null || (data.rating is int && data.rating >= 1 && data.rating <= 10)) &&
+        (!('review' in data) || data.review == null || (data.review is string && data.review.size() <= 5000)) &&
+        (!('notes' in data) || data.notes == null || (data.notes is string && data.notes.size() <= 5000)) &&
+        (!('totalPlayTimeSeconds' in data) || data.totalPlayTimeSeconds is int) &&
+        (!('lastPlayedTimestamp' in data) || data.lastPlayedTimestamp == null || data.lastPlayedTimestamp is int) &&
+        (!('addedTimestamp' in data) || data.addedTimestamp is int) &&
+        (!('isFavorite' in data) || data.isFavorite is bool) &&
+        (!('updatedAt' in data) || data.updatedAt is timestamp);
+    }
+
+    function isValidPlaySession(data, userId) {
+      return data.id is string && data.id.size() > 0 && data.id.size() <= 128 && isValidId(data.id) &&
+        data.userId == userId &&
+        data.gameId is string && data.gameId.size() > 0 && data.gameId.size() <= 128 &&
+        (!('gameTitle' in data) || data.gameTitle == null || (data.gameTitle is string && data.gameTitle.size() <= 200)) &&
+        (!('platform' in data) || data.platform == null || (data.platform is string && data.platform.size() <= 100)) &&
+        (!('startTime' in data) || data.startTime is int) &&
+        (!('endTime' in data) || data.endTime is int) &&
+        data.durationSeconds is int && data.durationSeconds >= 0 &&
+        (!('notes' in data) || data.notes == null || (data.notes is string && data.notes.size() <= 2000)) &&
+        (!('updatedAt' in data) || data.updatedAt is timestamp);
+    }
+
+    // User profile documents
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false; // Users cannot enumerate other users
+
+      allow create: if isOwner(userId) &&
+        isValidId(userId) &&
+        incoming().userId == userId &&
+        incoming().keys().hasAll(['userId', 'createdAt']) &&
+        incoming().createdAt is timestamp &&
+        incoming().createdAt <= request.time &&
+        isValidUserProfile(incoming(), userId);
+
+      allow update: if isOwner(userId) &&
+        incoming().userId == existing().userId &&
+        incoming().createdAt == existing().createdAt &&
+        (!('updatedAt' in incoming()) || (incoming().updatedAt is timestamp && incoming().updatedAt <= request.time)) &&
+        isValidUserProfile(incoming(), userId);
+
+      allow delete: if isOwner(userId);
+
+      // Games subcollection
+      match /games/{gameId} {
+        allow get: if isOwner(userId) && isValidId(gameId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+          isValidId(gameId) &&
+          incoming().id == gameId &&
+          incoming().userId == userId &&
+          incoming().keys().hasAll(['id', 'userId', 'title', 'platform', 'status', 'createdAt']) &&
+          incoming().createdAt is timestamp &&
+          incoming().createdAt <= request.time &&
+          isValidGame(incoming(), userId);
+
+        allow update: if isOwner(userId) &&
+          isValidId(gameId) &&
+          incoming().id == existing().id &&
+          incoming().userId == existing().userId &&
+          incoming().createdAt == existing().createdAt &&
+          (!('updatedAt' in incoming()) || (incoming().updatedAt is timestamp && incoming().updatedAt <= request.time)) &&
+          isValidGame(incoming(), userId);
+
+        allow delete: if isOwner(userId) && isValidId(gameId);
+      }
+
+      // PlaySessions subcollection
+      match /sessions/{sessionId} {
+        allow get: if isOwner(userId) && isValidId(sessionId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+          isValidId(sessionId) &&
+          incoming().id == sessionId &&
+          incoming().userId == userId &&
+          incoming().keys().hasAll(['id', 'userId', 'gameId', 'durationSeconds', 'createdAt']) &&
+          incoming().createdAt is timestamp &&
+          incoming().createdAt <= request.time &&
+          isValidPlaySession(incoming(), userId);
+
+        allow update: if isOwner(userId) &&
+          isValidId(sessionId) &&
+          incoming().id == existing().id &&
+          incoming().userId == existing().userId &&
+          incoming().createdAt == existing().createdAt &&
+          (!('updatedAt' in incoming()) || (incoming().updatedAt is timestamp && incoming().updatedAt <= request.time)) &&
+          isValidPlaySession(incoming(), userId);
+
+        allow delete: if isOwner(userId) && isValidId(sessionId);
+      }
+    }
+  }
+}

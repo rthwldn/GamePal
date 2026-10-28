@@ -1,6 +1,7 @@
 package com.example.data
 
 import com.example.GamePalApplication
+import com.example.data.firestore.FirestoreSyncManager
 import com.example.model.GameEntity
 import com.example.model.GameStatus
 import com.example.model.PlaySessionEntity
@@ -11,7 +12,8 @@ import kotlinx.coroutines.withContext
 
 class GameRepository(
     private val gameDao: GameDao,
-    private val playSessionDao: PlaySessionDao
+    private val playSessionDao: PlaySessionDao,
+    var syncManager: FirestoreSyncManager? = null
 ) {
     private fun notifyWidget() {
         try {
@@ -35,39 +37,53 @@ class GameRepository(
     suspend fun insertGame(game: GameEntity): Long = withContext(Dispatchers.IO) {
         val id = gameDao.insertGame(game)
         notifyWidget()
+        val savedGame = game.copy(id = id)
+        syncManager?.syncGame(savedGame)
         id
     }
 
     suspend fun updateGame(game: GameEntity) = withContext(Dispatchers.IO) {
         gameDao.updateGame(game)
         notifyWidget()
+        syncManager?.syncGame(game)
     }
 
     suspend fun deleteGame(id: Long) = withContext(Dispatchers.IO) {
         gameDao.deleteGameById(id)
         notifyWidget()
+        syncManager?.deleteGameFromCloud(id)
     }
 
     suspend fun updateRatingAndReview(id: Long, rating: Int?, review: String, notes: String) =
         withContext(Dispatchers.IO) {
             gameDao.updateRatingAndReview(id, rating, review, notes)
             notifyWidget()
+            gameDao.getGameByIdDirect(id)?.let { syncManager?.syncGame(it) }
         }
 
     suspend fun updateStatus(id: Long, status: String) = withContext(Dispatchers.IO) {
         gameDao.updateStatus(id, status)
         notifyWidget()
+        gameDao.getGameByIdDirect(id)?.let { syncManager?.syncGame(it) }
+    }
+
+    suspend fun updateCoverUrl(id: Long, coverUrl: String) = withContext(Dispatchers.IO) {
+        gameDao.updateCoverUrl(id, coverUrl)
+        notifyWidget()
+        gameDao.getGameByIdDirect(id)?.let { syncManager?.syncGame(it) }
     }
 
     suspend fun updateFavorite(id: Long, isFavorite: Boolean) = withContext(Dispatchers.IO) {
         gameDao.updateFavorite(id, isFavorite)
         notifyWidget()
+        gameDao.getGameByIdDirect(id)?.let { syncManager?.syncGame(it) }
     }
 
     suspend fun addPlayTime(gameId: Long, durationSeconds: Long, timestamp: Long = System.currentTimeMillis()) =
         withContext(Dispatchers.IO) {
             gameDao.addPlayTime(gameId, durationSeconds, timestamp)
             notifyWidget()
+            gameDao.getGameByIdDirect(gameId)?.let { syncManager?.syncGame(it) }
         }
 
     suspend fun recordSession(
@@ -89,11 +105,16 @@ class GameRepository(
                 durationSeconds = durationSeconds,
                 notes = sessionNotes
             )
-            playSessionDao.insertSession(session)
+            val sessionId = playSessionDao.insertSession(session)
 
             // 2. Increment total play time and update last played
             gameDao.addPlayTime(gameId, durationSeconds, endTime)
             notifyWidget()
+
+            // 3. Sync to Firestore
+            val sessionWithId = session.copy(id = sessionId)
+            syncManager?.syncSession(sessionWithId)
+            gameDao.getGameByIdDirect(gameId)?.let { syncManager?.syncGame(it) }
         }
     }
 

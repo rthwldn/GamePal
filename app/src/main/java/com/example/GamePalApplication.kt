@@ -20,13 +20,17 @@ class GamePalApplication : Application() {
     lateinit var repository: GameRepository
         private set
 
+    lateinit var syncManager: com.example.data.firestore.FirestoreSyncManager
+        private set
+
     val metadataService by lazy { GameMetadataService() }
 
     override fun onCreate() {
         super.onCreate()
         instance = this
         database = AppDatabase.getDatabase(this)
-        repository = GameRepository(database.gameDao(), database.playSessionDao())
+        syncManager = com.example.data.firestore.FirestoreSyncManager(this, database.gameDao(), database.playSessionDao())
+        repository = GameRepository(database.gameDao(), database.playSessionDao(), syncManager)
 
         // Initialize Live Activity Notification Channel
         GameSessionTrackingService.createNotificationChannel(this)

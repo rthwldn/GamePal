@@ -13,6 +13,9 @@ interface PlaySessionDao {
     @Query("SELECT * FROM play_sessions ORDER BY endTime DESC")
     fun getAllSessions(): Flow<List<PlaySessionEntity>>
 
+    @Query("SELECT * FROM play_sessions")
+    suspend fun getAllSessionsDirect(): List<PlaySessionEntity>
+
     @Query("SELECT * FROM play_sessions WHERE gameId = :gameId ORDER BY endTime DESC")
     fun getSessionsForGame(gameId: Long): Flow<List<PlaySessionEntity>>
 

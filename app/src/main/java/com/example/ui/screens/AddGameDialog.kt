@@ -1,5 +1,8 @@
 package com.example.ui.screens
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,12 +18,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.width
+import androidx.compose.ui.platform.testTag
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Search
@@ -67,6 +79,7 @@ import com.example.ui.components.PlatformBadge
 import com.example.ui.components.RatingPicker
 import com.example.ui.theme.GamePalPrimary
 import com.example.ui.theme.glassCard
+import com.example.util.ImageStorageUtil
 import com.example.viewmodel.GamePalViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -76,6 +89,7 @@ fun AddGameDialog(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     val isDark = true
 
     var searchQuery by remember { mutableStateOf("") }
@@ -95,6 +109,17 @@ fun AddGameDialog(
     var selectedNotes by remember { mutableStateOf("") }
     var initialHours by remember { mutableStateOf("") }
 
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        if (uri != null) {
+            val localPath = ImageStorageUtil.saveCoverImageFromUri(context, uri, prefix = "cover_new")
+            if (localPath != null) {
+                selectedCoverUrl = localPath
+            }
+        }
+    }
+
     var isCustomEditMode by remember { mutableStateOf(false) }
     var showPlatformDropdown by remember { mutableStateOf(false) }
 
@@ -104,38 +129,42 @@ fun AddGameDialog(
 
     Dialog(
         onDismissRequest = onDismiss,
-        properties = DialogProperties(usePlatformDefaultWidth = false)
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false
+        )
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(if (isDark) Color(0xCC000000) else Color(0x77000000))
                 .clickable(onClick = onDismiss)
-                .padding(14.dp),
+                .systemBarsPadding()
+                .imePadding()
+                .padding(horizontal = 16.dp, vertical = 20.dp),
             contentAlignment = Alignment.Center
         ) {
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxSize(0.96f)
+                    .fillMaxHeight(0.92f)
                     .clickable(enabled = false) {}
-                    .clip(RoundedCornerShape(14.dp))
+                    .clip(RoundedCornerShape(16.dp))
                     .border(
                         width = 1.dp,
                         brush = Brush.verticalGradient(
                             if (isDark) listOf(Color(0x35FFFFFF), Color(0x10FFFFFF))
                             else listOf(Color(0x30000000), Color(0x10000000))
                         ),
-                        shape = RoundedCornerShape(14.dp)
+                        shape = RoundedCornerShape(16.dp)
                     ),
                 color = containerBg,
-                shape = RoundedCornerShape(14.dp),
+                shape = RoundedCornerShape(16.dp),
                 shadowElevation = 16.dp
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(20.dp)
+                        .padding(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 12.dp)
                 ) {
                     // Header
                     Row(
@@ -255,7 +284,7 @@ fun AddGameDialog(
                                         GameCoverImage(
                                             coverUrl = result.coverUrl,
                                             contentDescription = result.title,
-                                            modifier = Modifier.size(width = 48.dp, height = 64.dp),
+                                            modifier = Modifier.size(width = 48.dp, height = 72.dp),
                                             cornerRadius = 8
                                         )
                                         Spacer(modifier = Modifier.width(12.dp))
@@ -556,20 +585,85 @@ fun AddGameDialog(
                                             unfocusedTextColor = MaterialTheme.colorScheme.onSurface
                                         )
                                     )
+
+                                    Spacer(modifier = Modifier.height(6.dp))
+
+                                    Button(
+                                        onClick = {
+                                            photoPickerLauncher.launch(
+                                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                            )
+                                        },
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = Color(0xFF27272A),
+                                            contentColor = Color.White
+                                        ),
+                                        shape = RoundedCornerShape(8.dp),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(42.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.AddPhotoAlternate,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            text = "Vybrat obrázek z telefonu (Galerie)",
+                                            fontSize = 12.sp,
+                                            fontWeight = FontWeight.SemiBold
+                                        )
+                                    }
+
+                                    if (selectedCoverUrl.isNotBlank()) {
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .clip(RoundedCornerShape(6.dp))
+                                                .background(Color(0xFF18181D))
+                                                .padding(8.dp)
+                                        ) {
+                                            GameCoverImage(
+                                                coverUrl = selectedCoverUrl,
+                                                contentDescription = "Náhled",
+                                                modifier = Modifier.size(width = 36.dp, height = 54.dp),
+                                                cornerRadius = 4
+                                            )
+                                            Spacer(modifier = Modifier.width(10.dp))
+                                            Text(
+                                                text = "Obal vybrán ✓",
+                                                fontSize = 12.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                color = Color.White,
+                                                modifier = Modifier.weight(1f)
+                                            )
+                                            TextButton(onClick = { selectedCoverUrl = "" }) {
+                                                Text("Odebrat", color = Color(0xFFEF4444), fontSize = 11.sp)
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(14.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
                     // Bottom Action Buttons
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp, bottom = 12.dp),
                         horizontalArrangement = Arrangement.End,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        TextButton(onClick = onDismiss) {
+                        TextButton(
+                            onClick = onDismiss,
+                            modifier = Modifier.height(48.dp)
+                        ) {
                             Text("Zrušit", color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
 
@@ -603,10 +697,19 @@ fun AddGameDialog(
                                 disabledContainerColor = Color(0xFF27272A),
                                 disabledContentColor = Color(0xFF71717A)
                             ),
-                            shape = RoundedCornerShape(8.dp),
-                            modifier = Modifier.height(48.dp)
+                            shape = RoundedCornerShape(10.dp),
+                            modifier = Modifier
+                                .height(48.dp)
+                                .testTag("add_game_submit_button")
                         ) {
-                            Text("Uložit do knihovny", fontWeight = FontWeight.Bold)
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = null,
+                                tint = if (selectedTitle.isNotBlank()) Color.Black else Color(0xFF71717A),
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("Přidat do knihovny", fontWeight = FontWeight.Bold)
                         }
                     }
                 }

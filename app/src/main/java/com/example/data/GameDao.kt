@@ -14,6 +14,9 @@ interface GameDao {
     @Query("SELECT * FROM games ORDER BY lastPlayedTimestamp DESC, addedTimestamp DESC")
     fun getAllGames(): Flow<List<GameEntity>>
 
+    @Query("SELECT * FROM games")
+    suspend fun getAllGamesDirect(): List<GameEntity>
+
     @Query("SELECT * FROM games WHERE id = :id")
     fun getGameById(id: Long): Flow<GameEntity?>
 
@@ -46,6 +49,9 @@ interface GameDao {
 
     @Query("UPDATE games SET status = :status WHERE id = :id")
     suspend fun updateStatus(id: Long, status: String)
+
+    @Query("UPDATE games SET coverUrl = :coverUrl WHERE id = :id")
+    suspend fun updateCoverUrl(id: Long, coverUrl: String)
 
     @Query("UPDATE games SET isFavorite = :isFavorite WHERE id = :id")
     suspend fun updateFavorite(id: Long, isFavorite: Boolean)

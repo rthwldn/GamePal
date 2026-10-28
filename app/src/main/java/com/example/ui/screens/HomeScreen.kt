@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -33,7 +34,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.CloudDone
+import androidx.compose.material.icons.filled.CloudSync
 import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.PlayArrow
@@ -43,6 +47,7 @@ import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -77,6 +82,10 @@ import androidx.compose.ui.unit.sp
 import com.example.model.GameEntity
 import com.example.model.GameStatus
 import com.example.model.PlatformInfo
+import com.example.data.firestore.FirestoreSyncManager
+import com.example.data.firestore.SyncState
+import com.example.ui.components.ChangeCoverDialog
+import com.example.ui.components.GoogleBackupDialog
 import com.example.ui.components.GameCoverImage
 import com.example.ui.components.LiveActivityBanner
 import com.example.ui.components.PlatformBadge
@@ -85,6 +94,8 @@ import com.example.ui.theme.GamePalSecondary
 import com.example.ui.theme.RatingGold
 import com.example.ui.theme.auroraBackground
 import com.example.ui.theme.glassCard
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import com.example.viewmodel.GamePalViewModel
 import com.example.viewmodel.SortOption
 
@@ -92,6 +103,7 @@ import com.example.viewmodel.SortOption
 @Composable
 fun HomeScreen(
     viewModel: GamePalViewModel,
+    syncManager: FirestoreSyncManager,
     onGameClick: (Long) -> Unit,
     onOpenAddGame: () -> Unit,
     modifier: Modifier = Modifier
@@ -105,8 +117,11 @@ fun HomeScreen(
     val selectedPlatform by viewModel.selectedPlatformFilter.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
     val currentSort by viewModel.sortOption.collectAsState()
+    val syncState by syncManager.syncState.collectAsState()
 
     var showSortMenu by remember { mutableStateOf(false) }
+    var gameToChangeCover by remember { mutableStateOf<GameEntity?>(null) }
+    var showBackupDialog by remember { mutableStateOf(false) }
 
     // Gesture navigation handler: if searching or filtering, back clears search or filters
     val hasActiveFilterOrSearch = searchQuery.isNotEmpty() || selectedStatus != null || selectedPlatform != null
@@ -133,6 +148,118 @@ fun HomeScreen(
             horizontalArrangement = Arrangement.spacedBy(14.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
+            // 0. App Title & Google Backup Status Pill
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp, bottom = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            modifier = Modifier
+                                .size(34.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(GamePalPrimary),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.SportsEsports,
+                                contentDescription = null,
+                                tint = Color(0xFF09090B),
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = "PlayPulse",
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                    }
+
+                    // Google Cloud Backup Indicator Pill
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(Color(0xFF18181B))
+                            .border(1.dp, Color(0xFF27272A), RoundedCornerShape(16.dp))
+                            .clickable { showBackupDialog = true }
+                            .padding(horizontal = 10.dp, vertical = 6.dp)
+                            .testTag("google_backup_button")
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            val user = Firebase.auth.currentUser
+                            if (user == null) {
+                                Icon(
+                                    imageVector = Icons.Default.CloudSync,
+                                    contentDescription = null,
+                                    tint = Color(0xFFA1A1AA),
+                                    modifier = Modifier.size(14.dp)
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = "Záloha: Vypnuto",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = Color(0xFFA1A1AA)
+                                )
+                            } else {
+                                when (syncState) {
+                                    is SyncState.Syncing -> {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.size(14.dp),
+                                            color = GamePalPrimary,
+                                            strokeWidth = 2.dp
+                                        )
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text(
+                                            text = "Zálohování...",
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Medium,
+                                            color = GamePalPrimary
+                                        )
+                                    }
+                                    is SyncState.Error -> {
+                                        Icon(
+                                            imageVector = Icons.Default.CloudSync,
+                                            contentDescription = null,
+                                            tint = Color(0xFFEF4444),
+                                            modifier = Modifier.size(14.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text(
+                                            text = "Chyba zálohy",
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Medium,
+                                            color = Color(0xFFEF4444)
+                                        )
+                                    }
+                                    else -> {
+                                        Icon(
+                                            imageVector = Icons.Default.CloudDone,
+                                            contentDescription = null,
+                                            tint = Color(0xFF10B981),
+                                            modifier = Modifier.size(14.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text(
+                                            text = "Google záloha",
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Medium,
+                                            color = Color.White
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             // 1. Live Activity Ongoing Session Banner (Top Priority)
             item(span = { GridItemSpan(maxLineSpan) }) {
                 LiveActivityBanner(
@@ -428,11 +555,35 @@ fun HomeScreen(
                         isTracking = activeSession?.gameId == game.id,
                         onClick = { onGameClick(game.id) },
                         onQuickPlay = { viewModel.startSession(context, game) },
+                        onChangeCover = { gameToChangeCover = game },
                         isDark = true
                     )
                 }
             }
         }
+    }
+
+    // Change cover dialog from long-press or edit button on Home grid
+    gameToChangeCover?.let { targetGame ->
+        ChangeCoverDialog(
+            game = targetGame,
+            onCoverSelected = { newCover ->
+                viewModel.updateGameCover(targetGame.id, newCover)
+                gameToChangeCover = null
+            },
+            onSearchOnline = { query ->
+                viewModel.searchOnlineCovers(query)
+            },
+            onDismiss = { gameToChangeCover = null }
+        )
+    }
+
+    if (showBackupDialog) {
+        GoogleBackupDialog(
+            syncManager = syncManager,
+            onDismiss = { showBackupDialog = false },
+            onSignOutComplete = { showBackupDialog = false }
+        )
     }
 }
 
@@ -489,6 +640,7 @@ fun GameCard(
     isTracking: Boolean,
     onClick: () -> Unit,
     onQuickPlay: () -> Unit,
+    onChangeCover: () -> Unit = {},
     isDark: Boolean,
     modifier: Modifier = Modifier
 ) {
@@ -511,7 +663,7 @@ fun GameCard(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(180.dp)
+                    .aspectRatio(2f / 3f)
             ) {
                 GameCoverImage(
                     coverUrl = game.coverUrl,
@@ -562,6 +714,55 @@ fun GameCard(
                         color = Color.White,
                         fontSize = 9.sp,
                         fontWeight = FontWeight.Bold
+                    )
+                }
+
+                // If no cover, display a clear "Změnit obal" badge
+                if (game.coverUrl.isBlank()) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(Color(0xD9000000))
+                            .border(1.dp, Color(0x40FFFFFF), RoundedCornerShape(6.dp))
+                            .clickable(onClick = onChangeCover)
+                            .padding(horizontal = 10.dp, vertical = 6.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "Nastavit obal",
+                                tint = Color.White,
+                                modifier = Modifier.size(12.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "Přidat obal",
+                                color = Color.White,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
+                }
+
+                // Bottom Left: Change Cover icon
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(6.dp)
+                        .size(26.dp)
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(Color(0xCC000000))
+                        .border(0.5.dp, Color(0x33FFFFFF), RoundedCornerShape(6.dp))
+                        .clickable(onClick = onChangeCover),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Změnit obal hry",
+                        tint = Color(0xFFD4D4D8),
+                        modifier = Modifier.size(13.dp)
                     )
                 }
 

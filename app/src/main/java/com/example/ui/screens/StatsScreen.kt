@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -491,7 +492,7 @@ private fun MostPlayedSpotlightCard(
             GameCoverImage(
                 coverUrl = game.coverUrl,
                 contentDescription = game.title,
-                modifier = Modifier.size(width = 54.dp, height = 72.dp),
+                modifier = Modifier.size(width = 54.dp, height = 81.dp),
                 cornerRadius = 8
             )
 
@@ -1091,7 +1092,7 @@ private fun HallOfFameSection(
                                 contentDescription = game.title,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(150.dp),
+                                    .aspectRatio(2f / 3f),
                                 cornerRadius = 6
                             )
 

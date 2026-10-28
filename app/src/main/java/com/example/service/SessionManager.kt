@@ -23,7 +23,7 @@ data class ActiveGameSession(
     val coverUrl: String,
     val startTimestamp: Long = System.currentTimeMillis(),
     val accumulatedElapsedMs: Long = 0L,
-    val lastResumeRealtimeMs: Long = SystemClock.elapsedRealtime(),
+    val lastResumeRealtimeMs: Long = 0L,
     val elapsedSeconds: Long = 0L,
     val isPaused: Boolean = false
 ) {

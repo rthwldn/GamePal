@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
@@ -70,6 +72,7 @@ import androidx.compose.ui.unit.sp
 import com.example.model.GameEntity
 import com.example.model.GameStatus
 import com.example.model.PlatformInfo
+import com.example.ui.components.ChangeCoverDialog
 import com.example.ui.components.GameCoverImage
 import com.example.ui.components.PlatformBadge
 import com.example.ui.components.RatingPicker
@@ -103,6 +106,7 @@ fun GameDetailScreen(
     var showManualTimeDialog by remember { mutableStateOf(false) }
     var showStatusDropdown by remember { mutableStateOf(false) }
     var showStopSessionDialog by remember { mutableStateOf(false) }
+    var showChangeCoverDialog by remember { mutableStateOf(false) }
     var sessionNotesInput by remember { mutableStateOf("") }
 
     val currentStatus = GameStatus.fromString(game.status)
@@ -110,6 +114,7 @@ fun GameDetailScreen(
     // Gesture navigation handler: closes dialogs if open, or returns to main screen
     BackHandler {
         when {
+            showChangeCoverDialog -> showChangeCoverDialog = false
             showDeleteConfirm -> showDeleteConfirm = false
             showManualTimeDialog -> showManualTimeDialog = false
             showStopSessionDialog -> showStopSessionDialog = false
@@ -138,6 +143,13 @@ fun GameDetailScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = { showChangeCoverDialog = true }) {
+                        Icon(
+                            imageVector = Icons.Default.AddPhotoAlternate,
+                            contentDescription = "Změnit obal hry",
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                     IconButton(onClick = { viewModel.toggleFavorite(game.id) }) {
                         Icon(
                             imageVector = if (game.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
@@ -180,15 +192,40 @@ fun GameDetailScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        // Game Poster
-                        GameCoverImage(
-                            coverUrl = game.coverUrl,
-                            contentDescription = game.title,
+                        // Game Poster with tap-to-edit badge
+                        Box(
                             modifier = Modifier
-                                .width(115.dp)
-                                .height(160.dp),
-                            cornerRadius = 8
-                        )
+                                .width(120.dp)
+                                .aspectRatio(2f / 3f)
+                                .clip(RoundedCornerShape(8.dp))
+                                .clickable { showChangeCoverDialog = true }
+                        ) {
+                            GameCoverImage(
+                                coverUrl = game.coverUrl,
+                                contentDescription = game.title,
+                                modifier = Modifier.fillMaxSize(),
+                                cornerRadius = 8
+                            )
+
+                            // Edit Overlay Badge
+                            Box(
+                                modifier = Modifier
+                                    .align(Alignment.BottomEnd)
+                                    .padding(6.dp)
+                                    .size(26.dp)
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(Color(0xD9000000))
+                                    .border(0.5.dp, Color(0x33FFFFFF), RoundedCornerShape(6.dp)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = "Změnit obal",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(13.dp)
+                                )
+                            }
+                        }
 
                         // Info Column
                         Column(modifier = Modifier.weight(1f)) {
@@ -244,6 +281,30 @@ fun GameDetailScreen(
                                         )
                                     }
                                 }
+                            }
+
+                            Spacer(modifier = Modifier.height(6.dp))
+
+                            // Fast trigger to change cover
+                            Row(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .clickable { showChangeCoverDialog = true }
+                                    .padding(vertical = 2.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.AddPhotoAlternate,
+                                    contentDescription = null,
+                                    tint = Color(0xFFA1A1AA),
+                                    modifier = Modifier.size(14.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = if (game.coverUrl.isBlank()) "Přidat obal hry" else "Změnit obal",
+                                    fontSize = 11.sp,
+                                    color = Color(0xFFA1A1AA)
+                                )
                             }
 
                             Spacer(modifier = Modifier.height(10.dp))
@@ -755,6 +816,20 @@ fun GameDetailScreen(
                     Text("Ponechat")
                 }
             }
+        )
+    }
+
+    // Change Cover Dialog (Local Photo Picker, Online Search, or Custom URL)
+    if (showChangeCoverDialog) {
+        ChangeCoverDialog(
+            game = game,
+            onCoverSelected = { newCover ->
+                viewModel.updateGameCover(game.id, newCover)
+            },
+            onSearchOnline = { query ->
+                viewModel.searchOnlineCovers(query)
+            },
+            onDismiss = { showChangeCoverDialog = false }
         )
     }
 }

@@ -76,7 +76,7 @@ fun FrostedBottomBar(
                 )
             )
             .windowInsetsPadding(WindowInsets.navigationBars)
-            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 10.dp),
+            .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 14.dp),
         contentAlignment = Alignment.Center
     ) {
         Box(
@@ -128,8 +128,8 @@ fun FrostedBottomBar(
                 Box(
                     modifier = Modifier
                         .padding(horizontal = 8.dp)
-                        .size(42.dp)
-                        .clip(RoundedCornerShape(10.dp))
+                        .size(46.dp)
+                        .clip(RoundedCornerShape(12.dp))
                         .background(Color.White)
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
@@ -143,7 +143,7 @@ fun FrostedBottomBar(
                         imageVector = Icons.Default.Add,
                         contentDescription = "Přidat hru",
                         tint = Color.Black,
-                        modifier = Modifier.size(22.dp)
+                        modifier = Modifier.size(24.dp)
                     )
                 }
 

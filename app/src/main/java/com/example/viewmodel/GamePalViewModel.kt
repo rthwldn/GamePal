@@ -277,6 +277,16 @@ class GamePalViewModel(
         }
     }
 
+    fun updateGameCover(gameId: Long, coverUrl: String) {
+        viewModelScope.launch {
+            repository.updateCoverUrl(gameId, coverUrl.trim())
+        }
+    }
+
+    suspend fun searchOnlineCovers(gameTitle: String): List<com.example.data.GameSearchResult> {
+        return metadataService.searchGames(gameTitle)
+    }
+
     fun toggleFavorite(gameId: Long) {
         val game = allGames.value.find { it.id == gameId } ?: return
         viewModelScope.launch {

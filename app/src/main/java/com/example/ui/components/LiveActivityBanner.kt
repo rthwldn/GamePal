@@ -89,7 +89,7 @@ fun LiveActivityBanner(
                         GameCoverImage(
                             coverUrl = activeSession.coverUrl,
                             contentDescription = activeSession.gameTitle,
-                            modifier = Modifier.size(width = 32.dp, height = 42.dp),
+                            modifier = Modifier.size(width = 32.dp, height = 48.dp),
                             cornerRadius = 6
                         )
 
