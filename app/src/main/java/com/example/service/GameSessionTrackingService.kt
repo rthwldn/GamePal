@@ -28,7 +28,7 @@ class GameSessionTrackingService : Service() {
     private var lastGameId: Long? = null
 
     companion object {
-        const val CHANNEL_ID = "gamepal_live_activity_channel"
+        const val CHANNEL_ID = "gamepal_live_activity_channel_v2"
         const val NOTIFICATION_ID = 1001
 
         const val ACTION_START = "com.example.service.ACTION_START"
@@ -40,10 +40,10 @@ class GameSessionTrackingService : Service() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 val channel = NotificationChannel(
                     CHANNEL_ID,
-                    "PlayPulse - Aktivní hraní",
-                    NotificationManager.IMPORTANCE_LOW
+                    "PlayPulse - Živá aktivita (Aktivní hraní)",
+                    NotificationManager.IMPORTANCE_DEFAULT
                 ).apply {
-                    description = "Zobrazuje aktivní čas hraní na zamčené obrazovce a v liště oznámení"
+                    description = "Zobrazuje aktivní odpočet a čas hraní na zamčené obrazovce a v liště oznámení"
                     lockscreenVisibility = Notification.VISIBILITY_PUBLIC
                     setShowBadge(false)
                     enableVibration(false)
@@ -207,6 +207,21 @@ class GameSessionTrackingService : Service() {
         // Hardware chronometer base time: System clock minus total elapsed so far
         val baseWhen = System.currentTimeMillis() - (session.elapsedSeconds * 1000L)
 
+        // Lockscreen Public Notification (explicitly rendered when lockscreen hides sensitive notifications)
+        val publicNotification = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setSmallIcon(R.mipmap.ic_launcher)
+            .setContentTitle("🎮 ${session.gameTitle}")
+            .setContentText(statusText)
+            .setSubText("Live Activity")
+            .setContentIntent(openAppPendingIntent)
+            .setOngoing(true)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setCategory(NotificationCompat.CATEGORY_PROGRESS)
+            .setUsesChronometer(!session.isPaused)
+            .setWhen(baseWhen)
+            .setShowWhen(true)
+            .build()
+
         val builder = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle("🎮 ${session.gameTitle} (${session.platform})")
@@ -216,8 +231,9 @@ class GameSessionTrackingService : Service() {
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setPublicVersion(publicNotification)
             .setCategory(NotificationCompat.CATEGORY_PROGRESS)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setUsesChronometer(!session.isPaused)
             .setWhen(baseWhen)
             .setShowWhen(true)
