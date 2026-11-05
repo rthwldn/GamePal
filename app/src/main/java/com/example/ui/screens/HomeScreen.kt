@@ -122,7 +122,7 @@ fun HomeScreen(
 
     val activeGameId by remember { derivedStateOf { activeSession?.gameId } }
     val popularPlatforms = remember {
-        listOf("PS5", "Xbox Series", "Switch", "Deck", "PC", "PS4", "PS2", "SNES", "NES")
+        listOf("PC", "PS5", "Xbox Series", "Switch", "Switch 2", "Ostatní")
     }
 
     var showSortMenu by remember { mutableStateOf(false) }
@@ -147,14 +147,14 @@ fun HomeScreen(
         modifier = modifier.auroraBackground(isDark = true)
     ) { innerPadding ->
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 160.dp),
+            columns = GridCells.Fixed(3),
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 12.dp),
             contentPadding = PaddingValues(top = 16.dp, bottom = 120.dp),
-            horizontalArrangement = Arrangement.spacedBy(14.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             // 0. App Title & Google Backup Status Pill
             item(span = { GridItemSpan(maxLineSpan) }) {
@@ -658,13 +658,13 @@ fun GameCard(
         modifier = modifier
             .fillMaxWidth()
             .glassCard(
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(10.dp),
                 isDark = isDark,
                 accentBorder = isTracking,
                 customTint = if (isTracking) Color(0xFF27272A) else null
             )
             .clickable(onClick = onClick)
-            .padding(10.dp)
+            .padding(6.dp)
     ) {
         Column {
             // Poster Cover Image with Badge Overlay
@@ -677,7 +677,7 @@ fun GameCard(
                     coverUrl = game.coverUrl,
                     contentDescription = game.title,
                     modifier = Modifier.fillMaxSize(),
-                    cornerRadius = 8
+                    cornerRadius = 6
                 )
 
                 // Top Left: Rating Score Star Badge
@@ -685,24 +685,24 @@ fun GameCard(
                     Box(
                         modifier = Modifier
                             .align(Alignment.TopStart)
-                            .padding(6.dp)
+                            .padding(4.dp)
                             .clip(RoundedCornerShape(4.dp))
                             .background(Color(0xE609090B))
-                            .padding(horizontal = 6.dp, vertical = 3.dp)
+                            .padding(horizontal = 4.dp, vertical = 2.dp)
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 imageVector = Icons.Default.Star,
                                 contentDescription = null,
                                 tint = RatingGold,
-                                modifier = Modifier.size(13.dp)
+                                modifier = Modifier.size(10.dp)
                             )
-                            Spacer(modifier = Modifier.width(3.dp))
+                            Spacer(modifier = Modifier.width(2.dp))
                             Text(
                                 text = "${game.rating}",
                                 color = Color.White,
                                 fontWeight = FontWeight.ExtraBold,
-                                fontSize = 11.sp
+                                fontSize = 10.sp
                             )
                         }
                     }
@@ -712,15 +712,15 @@ fun GameCard(
                 Box(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .padding(6.dp)
-                        .clip(RoundedCornerShape(4.dp))
+                        .padding(4.dp)
+                        .clip(RoundedCornerShape(3.dp))
                         .background(status.primaryColor.copy(alpha = 0.9f))
-                        .padding(horizontal = 6.dp, vertical = 2.dp)
+                        .padding(horizontal = 4.dp, vertical = 1.dp)
                 ) {
                     Text(
                         text = status.titleCs,
                         color = Color.White,
-                        fontSize = 9.sp,
+                        fontSize = 8.sp,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -734,20 +734,20 @@ fun GameCard(
                             .background(Color(0xD9000000))
                             .border(1.dp, Color(0x40FFFFFF), RoundedCornerShape(6.dp))
                             .clickable(onClick = onChangeCover)
-                            .padding(horizontal = 10.dp, vertical = 6.dp)
+                            .padding(horizontal = 6.dp, vertical = 4.dp)
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 imageVector = Icons.Default.Edit,
                                 contentDescription = "Nastavit obal",
                                 tint = Color.White,
-                                modifier = Modifier.size(12.dp)
+                                modifier = Modifier.size(11.dp)
                             )
-                            Spacer(modifier = Modifier.width(4.dp))
+                            Spacer(modifier = Modifier.width(3.dp))
                             Text(
-                                text = "Přidat obal",
+                                text = "+ Obal",
                                 color = Color.White,
-                                fontSize = 11.sp,
+                                fontSize = 10.sp,
                                 fontWeight = FontWeight.SemiBold
                             )
                         }
@@ -758,11 +758,11 @@ fun GameCard(
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
-                        .padding(6.dp)
-                        .size(26.dp)
-                        .clip(RoundedCornerShape(6.dp))
+                        .padding(4.dp)
+                        .size(22.dp)
+                        .clip(RoundedCornerShape(5.dp))
                         .background(Color(0xCC000000))
-                        .border(0.5.dp, Color(0x33FFFFFF), RoundedCornerShape(6.dp))
+                        .border(0.5.dp, Color(0x33FFFFFF), RoundedCornerShape(5.dp))
                         .clickable(onClick = onChangeCover),
                     contentAlignment = Alignment.Center
                 ) {
@@ -770,7 +770,7 @@ fun GameCard(
                         imageVector = Icons.Default.Edit,
                         contentDescription = "Změnit obal hry",
                         tint = Color(0xFFD4D4D8),
-                        modifier = Modifier.size(13.dp)
+                        modifier = Modifier.size(11.dp)
                     )
                 }
 
@@ -780,34 +780,34 @@ fun GameCard(
                         onClick = onQuickPlay,
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
-                            .padding(6.dp)
-                            .size(30.dp)
-                            .clip(RoundedCornerShape(6.dp))
+                            .padding(4.dp)
+                            .size(26.dp)
+                            .clip(RoundedCornerShape(5.dp))
                             .background(Color.White)
                     ) {
                         Icon(
                             imageVector = Icons.Default.PlayArrow,
                             contentDescription = "Spustit měření",
                             tint = Color.Black,
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(14.dp)
                         )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(5.dp))
 
             // Game Title
             Text(
                 text = game.title,
-                style = MaterialTheme.typography.titleSmall,
+                fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(3.dp))
 
             // Platform Badge + Total Play Time
             Row(
@@ -822,7 +822,7 @@ fun GameCard(
 
                 Text(
                     text = game.formattedTotalTime,
-                    fontSize = 11.sp,
+                    fontSize = 10.sp,
                     fontWeight = FontWeight.Bold,
                     color = if (isTracking) GamePalSecondary else MaterialTheme.colorScheme.onSurfaceVariant
                 )

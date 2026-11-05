@@ -70,5 +70,34 @@ class ExampleUnitTest {
         )
         assertEquals("01:25", shortSession.formattedTime)
     }
+
+    @Test
+    fun testPlatformConsolidation() {
+        val platforms = com.example.model.PlatformInfo.ALL_PLATFORMS
+        assertEquals(6, platforms.size)
+        val shortNames = platforms.map { it.shortName }
+        org.junit.Assert.assertTrue(shortNames.contains("PC"))
+        org.junit.Assert.assertTrue(shortNames.contains("PS5"))
+        org.junit.Assert.assertTrue(shortNames.contains("Xbox Series"))
+        org.junit.Assert.assertTrue(shortNames.contains("Switch"))
+        org.junit.Assert.assertTrue(shortNames.contains("Switch 2"))
+        org.junit.Assert.assertTrue(shortNames.contains("Ostatní"))
+
+        // Legacy / other platforms map to Ostatní
+        assertEquals("Ostatní", com.example.model.PlatformInfo.findByName("Nintendo 64").name)
+        assertEquals("Ostatní", com.example.model.PlatformInfo.findByName("PS4").name)
+        assertEquals("Nintendo Switch 2", com.example.model.PlatformInfo.findByName("Switch 2").name)
+    }
+
+    @Test
+    fun testSmartSearchOcarinaOfTime() {
+        // Lowercase, no punctuation
+        val results1 = com.example.data.PreloadedGames.search("ocarina of time")
+        org.junit.Assert.assertTrue(results1.any { it.title.contains("Ocarina of Time") })
+
+        // Mixed with platform query like user typed: "Ocarina of Time pro Switch 2"
+        val results2 = com.example.data.PreloadedGames.search("Ocarina of Time pro Switch 2")
+        org.junit.Assert.assertTrue(results2.any { it.title.contains("Ocarina of Time") })
+    }
 }
 

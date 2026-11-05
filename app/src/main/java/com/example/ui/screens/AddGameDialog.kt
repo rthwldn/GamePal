@@ -270,7 +270,16 @@ fun AddGameDialog(
                                         )
                                         .clickable {
                                             selectedTitle = result.title
-                                            selectedPlatform = result.platform
+                                            val queryLower = searchQuery.lowercase()
+                                            val detectedPlatform = when {
+                                                queryLower.contains("switch 2") || queryLower.contains("switch2") -> "Nintendo Switch 2"
+                                                queryLower.contains("ps5") || queryLower.contains("playstation 5") -> "PlayStation 5"
+                                                queryLower.contains("xbox series") || queryLower.contains("xbox") -> "Xbox Series"
+                                                queryLower.contains("pc") || queryLower.contains("steam") -> "PC"
+                                                queryLower.contains("switch") -> "Nintendo Switch"
+                                                else -> PlatformInfo.findByName(result.platform).name
+                                            }
+                                            selectedPlatform = detectedPlatform
                                             selectedCoverUrl = result.coverUrl
                                             selectedDescription = result.description
                                             selectedYear = result.releaseYear
@@ -428,8 +437,7 @@ fun AddGameDialog(
                                         horizontalArrangement = Arrangement.spacedBy(6.dp),
                                         verticalArrangement = Arrangement.spacedBy(6.dp)
                                     ) {
-                                        listOf("PS5", "Xbox Series", "Switch", "Deck", "PC", "PS4", "PS2", "SNES", "NES").forEach { pShort ->
-                                            val p = PlatformInfo.findByName(pShort)
+                                        PlatformInfo.ALL_PLATFORMS.forEach { p ->
                                             val isSel = selectedPlatform.equals(p.name, true)
                                             Box(
                                                 modifier = Modifier
@@ -443,11 +451,11 @@ fun AddGameDialog(
                                                         RoundedCornerShape(6.dp)
                                                     )
                                                     .clickable { selectedPlatform = p.name }
-                                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                                                    .padding(horizontal = 10.dp, vertical = 6.dp)
                                             ) {
                                                 Text(
                                                     text = p.shortName,
-                                                    fontSize = 11.sp,
+                                                    fontSize = 12.sp,
                                                     fontWeight = if (isSel) FontWeight.Bold else FontWeight.Normal,
                                                     color = if (isSel) Color.Black else MaterialTheme.colorScheme.onSurface
                                                 )
