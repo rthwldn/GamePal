@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -42,6 +43,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ui.theme.ExpressiveCyanGlow
+import com.example.ui.theme.ExpressiveElectricIndigo
 
 enum class MainNavTab(
     val title: String,
@@ -52,27 +55,28 @@ enum class MainNavTab(
     STATS("Statistiky", Icons.Default.BarChart, Icons.Outlined.BarChart)
 }
 
+// Fade to pure OLED black #000000
 private val BottomBarScrimBrush = Brush.verticalGradient(
     colors = listOf(
         Color.Transparent,
-        Color(0x7709090B),
-        Color(0xD909090B),
-        Color(0xFF09090B)
+        Color(0x88000000),
+        Color(0xEE000000),
+        Color(0xFF000000)
     )
 )
 
 private val BottomBarBackgroundBrush = Brush.verticalGradient(
     colors = listOf(
-        Color(0xF518181D),
-        Color(0xF8121215),
-        Color(0xFF09090B)
+        Color(0xF5171720),
+        Color(0xF8111116),
+        Color(0xFF09090D)
     )
 )
 
 private val BottomBarBorderBrush = Brush.verticalGradient(
     colors = listOf(
-        Color(0x33FFFFFF),
-        Color(0x10FFFFFF)
+        Color(0x3DFFFFFF),
+        Color(0x18FFFFFF)
     )
 )
 
@@ -84,24 +88,25 @@ fun FrostedBottomBar(
     modifier: Modifier = Modifier,
     isDark: Boolean = true
 ) {
-    val barShape = remember { RoundedCornerShape(14.dp) }
+    // Material 3 Expressive Pill Shape
+    val barShape = remember { RoundedCornerShape(percent = 50) }
 
     Box(
         modifier = modifier
             .fillMaxWidth()
             .background(BottomBarScrimBrush)
             .windowInsetsPadding(WindowInsets.navigationBars)
-            .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 14.dp),
+            .padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 12.dp),
         contentAlignment = Alignment.Center
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .shadow(
-                    elevation = 12.dp,
+                    elevation = 16.dp,
                     shape = barShape,
-                    spotColor = Color(0xCC000000),
-                    ambientColor = Color(0x66000000)
+                    spotColor = Color(0xFF000000),
+                    ambientColor = Color(0x99000000)
                 )
                 .clip(barShape)
                 .background(BottomBarBackgroundBrush)
@@ -126,13 +131,17 @@ fun FrostedBottomBar(
                     modifier = Modifier.weight(1f)
                 )
 
-                // Middle Action: Modern Industrial Add Button (Crisp White Squircle)
+                // Middle Action: Expressive Tactile Action Button (Pill / Circle)
                 Box(
                     modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                        .size(46.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(Color.White)
+                        .padding(horizontal = 6.dp)
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .background(
+                            Brush.linearGradient(
+                                listOf(Color(0xFFFFFFFF), Color(0xFFE2E8F0))
+                            )
+                        )
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
@@ -170,23 +179,17 @@ private fun NavTabItem(
     isDark: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val tabShape = RoundedCornerShape(8.dp)
+    // Material 3 Expressive Active Pill Indicator
+    val pillShape = remember { RoundedCornerShape(percent = 50) }
     val pillBg = if (isSelected) {
-        if (isDark) Color(0x1FFFFFFF) else Color(0x14000000)
+        if (isDark) Color(0x28FFFFFF) else Color(0x14000000)
     } else Color.Transparent
 
-    val iconTint = if (isSelected) Color.White else {
-        if (isDark) Color(0xFF71717A) else Color(0xFF71717A)
-    }
-
-    val textColor = if (isSelected) {
-        if (isDark) Color.White else Color(0xFF09090B)
-    } else {
-        if (isDark) Color(0xFF71717A) else Color(0xFF71717A)
-    }
+    val iconTint = if (isSelected) Color.White else Color(0xFF94A3B8)
+    val textColor = if (isSelected) Color.White else Color(0xFF94A3B8)
 
     val pillPaddingHorizontal by animateDpAsState(
-        targetValue = if (isSelected) 12.dp else 6.dp,
+        targetValue = if (isSelected) 14.dp else 8.dp,
         animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
         label = "PillPadding"
     )
@@ -194,7 +197,7 @@ private fun NavTabItem(
     Box(
         modifier = modifier
             .height(44.dp)
-            .clip(tabShape)
+            .clip(pillShape)
             .background(pillBg)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },

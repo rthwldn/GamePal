@@ -59,10 +59,10 @@ fun LiveActivityBanner(
             Box(
                 modifier = modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 6.dp)
-                    .glassCard(shape = RoundedCornerShape(12.dp), accentBorder = true)
+                    .padding(horizontal = 4.dp, vertical = 6.dp)
+                    .glassCard(shape = RoundedCornerShape(20.dp), accentBorder = true)
                     .clickable { onBannerClick(activeSession.gameId) }
-                    .padding(horizontal = 14.dp, vertical = 10.dp)
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),

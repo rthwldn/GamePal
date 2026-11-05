@@ -168,9 +168,9 @@ fun HomeScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(
                             modifier = Modifier
-                                .size(34.dp)
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(GamePalPrimary),
+                                .size(36.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(Brush.linearGradient(listOf(Color.White, Color(0xFFE2E8F0)))),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
@@ -184,19 +184,20 @@ fun HomeScreen(
                         Text(
                             text = "PlayPulse",
                             fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.Black,
                             color = Color.White
                         )
                     }
 
-                    // Google Cloud Backup Indicator Pill
+                    // Google Cloud Backup Indicator Pill (M3 Expressive Pill)
+                    val backupShape = RoundedCornerShape(percent = 50)
                     Box(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(Color(0xFF18181B))
-                            .border(1.dp, Color(0xFF27272A), RoundedCornerShape(16.dp))
+                            .clip(backupShape)
+                            .background(Color(0xFF13131A))
+                            .border(1.dp, Color(0xFF262634), backupShape)
                             .clickable { showBackupDialog = true }
-                            .padding(horizontal = 10.dp, vertical = 6.dp)
+                            .padding(horizontal = 12.dp, vertical = 6.dp)
                             .testTag("google_backup_button")
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -289,7 +290,7 @@ fun HomeScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .glassCard(shape = RoundedCornerShape(12.dp), isDark = true)
+                        .glassCard(shape = RoundedCornerShape(20.dp), isDark = true)
                         .padding(16.dp)
                 ) {
                     Row(
@@ -339,7 +340,7 @@ fun HomeScreen(
                 }
             }
 
-            // 3. Search Field
+            // 3. Search Field (M3 Expressive Pill)
             item(span = { GridItemSpan(maxLineSpan) }) {
                 OutlinedTextField(
                     value = searchQuery,
@@ -347,7 +348,7 @@ fun HomeScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .testTag("search_games_input"),
-                    placeholder = { Text("Hledat v knihovně...") },
+                    placeholder = { Text("Hledat v knihovně...", color = Color(0xFF94A3B8)) },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Search,
@@ -358,16 +359,18 @@ fun HomeScreen(
                     trailingIcon = {
                         if (searchQuery.isNotBlank()) {
                             IconButton(onClick = { viewModel.searchQuery.value = "" }) {
-                                Icon(Icons.Default.Clear, contentDescription = "Vymazat")
+                                Icon(Icons.Default.Clear, contentDescription = "Vymazat", tint = Color.White)
                             }
                         }
                     },
-                    shape = RoundedCornerShape(8.dp),
+                    shape = RoundedCornerShape(percent = 50),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color.White,
-                        unfocusedBorderColor = Color(0xFF27272A),
-                        focusedContainerColor = Color(0xFF141417),
-                        unfocusedContainerColor = Color(0xFF101013)
+                        unfocusedBorderColor = Color(0xFF262634),
+                        focusedContainerColor = Color(0xFF13131A),
+                        unfocusedContainerColor = Color(0xFF0F0F14),
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White
                     ),
                     singleLine = true
                 )
@@ -411,6 +414,7 @@ fun HomeScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         // Platform chips (popular quick filters)
+                        val chipShape = RoundedCornerShape(percent = 50)
                         LazyRow(
                             modifier = Modifier.weight(1f),
                             horizontalArrangement = Arrangement.spacedBy(6.dp)
@@ -419,19 +423,23 @@ fun HomeScreen(
                                 val isAll = selectedPlatform == null
                                 Box(
                                     modifier = Modifier
-                                        .clip(RoundedCornerShape(8.dp))
+                                        .clip(chipShape)
                                         .background(
-                                            if (isAll) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
-                                            else Color.Transparent
+                                            if (isAll) Color.White else Color(0xFF13131A)
+                                        )
+                                        .border(
+                                            1.dp,
+                                            if (isAll) Color.White else Color(0xFF262634),
+                                            chipShape
                                         )
                                         .clickable { viewModel.selectedPlatformFilter.value = null }
-                                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                                        .padding(horizontal = 12.dp, vertical = 6.dp)
                                 ) {
                                     Text(
-                                        text = "Všechny platformy",
+                                        text = "Vše",
                                         fontSize = 11.sp,
-                                        fontWeight = if (isAll) FontWeight.Bold else FontWeight.Normal,
-                                        color = if (isAll) GamePalPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                                        fontWeight = if (isAll) FontWeight.Bold else FontWeight.Medium,
+                                        color = if (isAll) Color.Black else Color(0xFF94A3B8)
                                     )
                                 }
                             }
@@ -442,38 +450,50 @@ fun HomeScreen(
                                 item(key = "platform_$pShort") {
                                     Box(
                                         modifier = Modifier
-                                            .clip(RoundedCornerShape(8.dp))
+                                            .clip(chipShape)
                                             .background(
-                                                if (isSel) p.brandColor.copy(alpha = 0.3f)
-                                                else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                                                if (isSel) p.brandColor.copy(alpha = 0.35f)
+                                                else Color(0xFF13131A)
+                                            )
+                                            .border(
+                                                1.dp,
+                                                if (isSel) p.brandColor else Color(0xFF262634),
+                                                chipShape
                                             )
                                             .clickable {
                                                 viewModel.selectedPlatformFilter.value = if (isSel) null else p.name
                                             }
-                                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                                            .padding(horizontal = 10.dp, vertical = 6.dp)
                                     ) {
                                         Text(
                                             text = p.shortName,
                                             fontSize = 11.sp,
                                             fontWeight = if (isSel) FontWeight.Bold else FontWeight.Normal,
-                                            color = if (isSel) p.accentColor else MaterialTheme.colorScheme.onSurfaceVariant
+                                            color = if (isSel) p.accentColor else Color(0xFF94A3B8)
                                         )
                                     }
                                 }
                             }
                         }
 
-                        // Sort Menu Dropdown
+                        Spacer(modifier = Modifier.width(6.dp))
+
+                        // Sort Menu Dropdown (Expressive Circle)
                         Box {
-                            IconButton(
-                                onClick = { showSortMenu = true },
-                                modifier = Modifier.size(32.dp)
+                            Box(
+                                modifier = Modifier
+                                    .size(34.dp)
+                                    .clip(CircleShape)
+                                    .background(Color(0xFF13131A))
+                                    .border(1.dp, Color(0xFF262634), CircleShape)
+                                    .clickable { showSortMenu = true },
+                                contentAlignment = Alignment.Center
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Sort,
                                     contentDescription = "Řazení",
-                                    tint = GamePalPrimary,
-                                    modifier = Modifier.size(20.dp)
+                                    tint = Color.White,
+                                    modifier = Modifier.size(18.dp)
                                 )
                             }
 
@@ -619,25 +639,26 @@ fun FilterChipPill(
     activeColor: Color,
     onClick: () -> Unit
 ) {
+    val chipShape = RoundedCornerShape(percent = 50)
     Box(
         modifier = Modifier
-            .clip(RoundedCornerShape(6.dp))
+            .clip(chipShape)
             .background(
-                if (isSelected) Color.White else Color(0xFF18181B)
+                if (isSelected) Color.White else Color(0xFF13131A)
             )
             .border(
                 1.dp,
-                if (isSelected) Color.White else Color(0xFF27272A),
-                RoundedCornerShape(6.dp)
+                if (isSelected) Color.White else Color(0xFF262634),
+                chipShape
             )
             .clickable(onClick = onClick)
-            .padding(horizontal = 10.dp, vertical = 5.dp)
+            .padding(horizontal = 14.dp, vertical = 7.dp)
     ) {
         Text(
             text = label,
             fontSize = 12.sp,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-            color = if (isSelected) Color.Black else Color(0xFFA1A1AA)
+            color = if (isSelected) Color.Black else Color(0xFF94A3B8)
         )
     }
 }
@@ -653,15 +674,16 @@ fun GameCard(
     modifier: Modifier = Modifier
 ) {
     val status = GameStatus.fromString(game.status)
+    val cardShape = RoundedCornerShape(12.dp)
 
     Box(
         modifier = modifier
             .fillMaxWidth()
             .glassCard(
-                shape = RoundedCornerShape(10.dp),
+                shape = cardShape,
                 isDark = isDark,
                 accentBorder = isTracking,
-                customTint = if (isTracking) Color(0xFF27272A) else null
+                customTint = if (isTracking) Color(0xFF222230) else null
             )
             .clickable(onClick = onClick)
             .padding(6.dp)
@@ -677,18 +699,20 @@ fun GameCard(
                     coverUrl = game.coverUrl,
                     contentDescription = game.title,
                     modifier = Modifier.fillMaxSize(),
-                    cornerRadius = 6
+                    cornerRadius = 8
                 )
 
-                // Top Left: Rating Score Star Badge
+                // Top Left: Rating Score Star Badge (M3 Expressive Pill)
                 if (game.rating != null && game.rating > 0) {
+                    val starPill = RoundedCornerShape(percent = 50)
                     Box(
                         modifier = Modifier
                             .align(Alignment.TopStart)
                             .padding(4.dp)
-                            .clip(RoundedCornerShape(4.dp))
-                            .background(Color(0xE609090B))
-                            .padding(horizontal = 4.dp, vertical = 2.dp)
+                            .clip(starPill)
+                            .background(Color(0xE6000000))
+                            .border(0.5.dp, RatingGold.copy(alpha = 0.5f), starPill)
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
@@ -708,14 +732,15 @@ fun GameCard(
                     }
                 }
 
-                // Top Right: Status dot / pill
+                // Top Right: Status dot / pill (M3 Expressive Pill)
+                val statusPill = RoundedCornerShape(percent = 50)
                 Box(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(4.dp)
-                        .clip(RoundedCornerShape(3.dp))
-                        .background(status.primaryColor.copy(alpha = 0.9f))
-                        .padding(horizontal = 4.dp, vertical = 1.dp)
+                        .clip(statusPill)
+                        .background(status.primaryColor.copy(alpha = 0.95f))
+                        .padding(horizontal = 6.dp, vertical = 2.dp)
                 ) {
                     Text(
                         text = status.titleCs,
@@ -727,14 +752,15 @@ fun GameCard(
 
                 // If no cover, display a clear "Změnit obal" badge
                 if (game.coverUrl.isBlank()) {
+                    val editPill = RoundedCornerShape(percent = 50)
                     Box(
                         modifier = Modifier
                             .align(Alignment.Center)
-                            .clip(RoundedCornerShape(6.dp))
-                            .background(Color(0xD9000000))
-                            .border(1.dp, Color(0x40FFFFFF), RoundedCornerShape(6.dp))
+                            .clip(editPill)
+                            .background(Color(0xE6000000))
+                            .border(1.dp, Color(0x60FFFFFF), editPill)
                             .clickable(onClick = onChangeCover)
-                            .padding(horizontal = 6.dp, vertical = 4.dp)
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
@@ -754,27 +780,27 @@ fun GameCard(
                     }
                 }
 
-                // Bottom Left: Change Cover icon
+                // Bottom Left: Change Cover icon (Circle)
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
                         .padding(4.dp)
-                        .size(22.dp)
-                        .clip(RoundedCornerShape(5.dp))
-                        .background(Color(0xCC000000))
-                        .border(0.5.dp, Color(0x33FFFFFF), RoundedCornerShape(5.dp))
+                        .size(24.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xD9000000))
+                        .border(0.5.dp, Color(0x40FFFFFF), CircleShape)
                         .clickable(onClick = onChangeCover),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.Edit,
                         contentDescription = "Změnit obal hry",
-                        tint = Color(0xFFD4D4D8),
+                        tint = Color(0xFFE2E8F0),
                         modifier = Modifier.size(11.dp)
                     )
                 }
 
-                // Bottom Right: Quick Play / Live Activity Button
+                // Bottom Right: Quick Play / Live Activity Button (Circle)
                 if (!isTracking) {
                     IconButton(
                         onClick = onQuickPlay,
@@ -782,7 +808,7 @@ fun GameCard(
                             .align(Alignment.BottomEnd)
                             .padding(4.dp)
                             .size(26.dp)
-                            .clip(RoundedCornerShape(5.dp))
+                            .clip(CircleShape)
                             .background(Color.White)
                     ) {
                         Icon(
@@ -802,7 +828,7 @@ fun GameCard(
                 text = game.title,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = Color.White,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )

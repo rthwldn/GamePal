@@ -185,7 +185,7 @@ fun GameDetailScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .glassCard(shape = RoundedCornerShape(12.dp), accentBorder = isTrackingThisGame)
+                        .glassCard(shape = RoundedCornerShape(20.dp), accentBorder = isTrackingThisGame)
                         .padding(16.dp)
                 ) {
                     Row(
@@ -330,9 +330,9 @@ fun GameDetailScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .glassCard(
-                            shape = RoundedCornerShape(12.dp),
+                            shape = RoundedCornerShape(20.dp),
                             accentBorder = true,
-                            customTint = if (isTrackingThisGame) Color(0xFF27272A) else null
+                            customTint = if (isTrackingThisGame) Color(0xFF222230) else null
                         )
                         .padding(18.dp)
                 ) {
@@ -360,11 +360,13 @@ fun GameDetailScreen(
                             }
 
                             if (isTrackingThisGame) {
+                                val livePill = RoundedCornerShape(percent = 50)
                                 Box(
                                     modifier = Modifier
-                                        .clip(RoundedCornerShape(8.dp))
+                                        .clip(livePill)
                                         .background(Color(0xFF10B981).copy(alpha = 0.2f))
-                                        .padding(horizontal = 8.dp, vertical = 2.dp)
+                                        .border(0.5.dp, Color(0xFF10B981), livePill)
+                                        .padding(horizontal = 10.dp, vertical = 3.dp)
                                 ) {
                                     Text(
                                         text = if (activeSession?.isPaused == true) "POZASTAVENO" else "NA ZAMČENÉ OBRAZOVCE",
@@ -411,7 +413,7 @@ fun GameDetailScreen(
 
                         Spacer(modifier = Modifier.height(14.dp))
 
-                        // Actions
+                        // Actions (M3 Expressive Pill Buttons)
                         if (isTrackingThisGame) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -425,12 +427,12 @@ fun GameDetailScreen(
                                             viewModel.pauseSession(context)
                                         }
                                     },
-                                    modifier = Modifier.weight(1f),
+                                    modifier = Modifier.weight(1f).height(44.dp),
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = if (activeSession?.isPaused == true) Color(0xFF10B981) else Color(0xFFF59E0B),
                                         contentColor = Color.White
                                     ),
-                                    shape = RoundedCornerShape(8.dp)
+                                    shape = RoundedCornerShape(percent = 50)
                                 ) {
                                     Icon(
                                         imageVector = if (activeSession?.isPaused == true) Icons.Default.PlayArrow else Icons.Default.Pause,
@@ -442,12 +444,12 @@ fun GameDetailScreen(
 
                                 Button(
                                     onClick = { showStopSessionDialog = true },
-                                    modifier = Modifier.weight(1f),
+                                    modifier = Modifier.weight(1f).height(44.dp),
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = Color(0xFFEF4444),
                                         contentColor = Color.White
                                     ),
-                                    shape = RoundedCornerShape(8.dp)
+                                    shape = RoundedCornerShape(percent = 50)
                                 ) {
                                     Icon(Icons.Default.Stop, contentDescription = null)
                                     Spacer(modifier = Modifier.width(6.dp))
@@ -464,7 +466,7 @@ fun GameDetailScreen(
                                     containerColor = Color.White,
                                     contentColor = Color.Black
                                 ),
-                                shape = RoundedCornerShape(8.dp)
+                                shape = RoundedCornerShape(percent = 50)
                             ) {
                                 Icon(Icons.Default.PlayArrow, contentDescription = null)
                                 Spacer(modifier = Modifier.width(8.dp))

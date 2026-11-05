@@ -123,9 +123,9 @@ fun AddGameDialog(
     var isCustomEditMode by remember { mutableStateOf(false) }
     var showPlatformDropdown by remember { mutableStateOf(false) }
 
-    val containerBg = if (isDark) Color(0xF7101014) else Color(0xFAFFFFFF)
-    val inputBg = if (isDark) Color(0xFF141417) else Color(0xFFF1F5F9)
-    val inputBorder = if (isDark) Color(0xFF27272A) else Color(0xFFE4E4E7)
+    val containerBg = Color(0xFF0D0D12)
+    val inputBg = Color(0xFF14141B)
+    val inputBorder = Color(0xFF262634)
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -136,7 +136,7 @@ fun AddGameDialog(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(if (isDark) Color(0xCC000000) else Color(0x77000000))
+                .background(Color(0xE6000000))
                 .clickable(onClick = onDismiss)
                 .systemBarsPadding()
                 .imePadding()
@@ -148,23 +148,22 @@ fun AddGameDialog(
                     .fillMaxWidth()
                     .fillMaxHeight(0.92f)
                     .clickable(enabled = false) {}
-                    .clip(RoundedCornerShape(16.dp))
+                    .clip(RoundedCornerShape(24.dp))
                     .border(
                         width = 1.dp,
                         brush = Brush.verticalGradient(
-                            if (isDark) listOf(Color(0x35FFFFFF), Color(0x10FFFFFF))
-                            else listOf(Color(0x30000000), Color(0x10000000))
+                            listOf(Color(0x3DFFFFFF), Color(0x14FFFFFF))
                         ),
-                        shape = RoundedCornerShape(16.dp)
+                        shape = RoundedCornerShape(24.dp)
                     ),
                 color = containerBg,
-                shape = RoundedCornerShape(16.dp),
-                shadowElevation = 16.dp
+                shape = RoundedCornerShape(24.dp),
+                shadowElevation = 24.dp
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 12.dp)
+                        .padding(start = 18.dp, end = 18.dp, top = 16.dp, bottom = 14.dp)
                 ) {
                     // Header
                     Row(
@@ -177,12 +176,12 @@ fun AddGameDialog(
                                 text = "Přidat hru do knihovny",
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Black,
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = Color.White
                             )
                             Text(
-                                text = "Hledejte v databázi IGDB nebo zadejte vlastní titul",
+                                text = "Hledejte v databázi her nebo zadejte vlastní titul",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = Color(0xFF94A3B8)
                             )
                         }
 
@@ -190,14 +189,14 @@ fun AddGameDialog(
                             Icon(
                                 imageVector = Icons.Default.Close,
                                 contentDescription = "Zavřít",
-                                tint = MaterialTheme.colorScheme.onSurface
+                                tint = Color.White
                             )
                         }
                     }
 
                     Spacer(modifier = Modifier.height(14.dp))
 
-                    // Search Bar
+                    // Search Bar (M3 Expressive Pill)
                     OutlinedTextField(
                         value = searchQuery,
                         onValueChange = {
@@ -208,12 +207,12 @@ fun AddGameDialog(
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Např. Zelda, Elden Ring, Mario, Cyberpunk...") },
+                        placeholder = { Text("Např. Zelda, Elden Ring, Mario, Cyberpunk...", color = Color(0xFF94A3B8)) },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Search,
                                 contentDescription = "Hledat",
-                                tint = GamePalPrimary
+                                tint = Color.White
                             )
                         },
                         trailingIcon = {
@@ -221,18 +220,18 @@ fun AddGameDialog(
                                 CircularProgressIndicator(
                                     modifier = Modifier.size(20.dp),
                                     strokeWidth = 2.dp,
-                                    color = GamePalPrimary
+                                    color = Color.White
                                 )
                             }
                         },
-                        shape = RoundedCornerShape(8.dp),
+                        shape = RoundedCornerShape(percent = 50),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color.White,
                             unfocusedBorderColor = inputBorder,
                             focusedContainerColor = inputBg,
                             unfocusedContainerColor = inputBg,
-                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White
                         ),
                         singleLine = true
                     )
@@ -432,7 +431,8 @@ fun AddGameDialog(
 
                                     Spacer(modifier = Modifier.height(8.dp))
 
-                                    // Quick platform chips
+                                    // Quick platform chips (M3 Expressive Pills)
+                                    val platformPillShape = RoundedCornerShape(percent = 50)
                                     FlowRow(
                                         horizontalArrangement = Arrangement.spacedBy(6.dp),
                                         verticalArrangement = Arrangement.spacedBy(6.dp)
@@ -441,23 +441,23 @@ fun AddGameDialog(
                                             val isSel = selectedPlatform.equals(p.name, true)
                                             Box(
                                                 modifier = Modifier
-                                                    .clip(RoundedCornerShape(6.dp))
+                                                    .clip(platformPillShape)
                                                     .background(
-                                                        if (isSel) Color.White else (if (isDark) Color(0xFF1E1E24) else Color(0xFFE2E8F0))
+                                                        if (isSel) Color.White else Color(0xFF14141B)
                                                     )
                                                     .border(
                                                         1.dp,
-                                                        if (isSel) Color.White else Color(0xFF27272A),
-                                                        RoundedCornerShape(6.dp)
+                                                        if (isSel) Color.White else Color(0xFF262634),
+                                                        platformPillShape
                                                     )
                                                     .clickable { selectedPlatform = p.name }
-                                                    .padding(horizontal = 10.dp, vertical = 6.dp)
+                                                    .padding(horizontal = 12.dp, vertical = 7.dp)
                                             ) {
                                                 Text(
                                                     text = p.shortName,
                                                     fontSize = 12.sp,
                                                     fontWeight = if (isSel) FontWeight.Bold else FontWeight.Normal,
-                                                    color = if (isSel) Color.Black else MaterialTheme.colorScheme.onSurface
+                                                    color = if (isSel) Color.Black else Color.White
                                                 )
                                             }
                                         }
@@ -465,15 +465,16 @@ fun AddGameDialog(
 
                                     Spacer(modifier = Modifier.height(14.dp))
 
-                                    // Status Selection
+                                    // Status Selection (M3 Expressive Pills)
                                     Text(
                                         text = "Stav v knihovně:",
                                         style = MaterialTheme.typography.labelLarge,
                                         fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.onSurface
+                                        color = Color.White
                                     )
                                     Spacer(modifier = Modifier.height(6.dp))
 
+                                    val statusPillShape = RoundedCornerShape(percent = 50)
                                     FlowRow(
                                         horizontalArrangement = Arrangement.spacedBy(6.dp),
                                         verticalArrangement = Arrangement.spacedBy(6.dp)
@@ -482,23 +483,23 @@ fun AddGameDialog(
                                             val isSelected = selectedStatus == status.id
                                             Box(
                                                 modifier = Modifier
-                                                    .clip(RoundedCornerShape(6.dp))
+                                                    .clip(statusPillShape)
                                                     .background(
-                                                        if (isSelected) status.primaryColor else (if (isDark) Color(0xFF1E1E24) else Color(0xFFE2E8F0))
+                                                        if (isSelected) status.primaryColor else Color(0xFF14141B)
                                                     )
                                                     .border(
                                                         1.dp,
-                                                        if (isSelected) status.primaryColor else Color(0xFF27272A),
-                                                        RoundedCornerShape(6.dp)
+                                                        if (isSelected) status.primaryColor else Color(0xFF262634),
+                                                        statusPillShape
                                                     )
                                                     .clickable { selectedStatus = status.id }
-                                                    .padding(horizontal = 10.dp, vertical = 6.dp)
+                                                    .padding(horizontal = 12.dp, vertical = 7.dp)
                                             ) {
                                                 Text(
                                                     text = status.titleCs,
                                                     fontSize = 12.sp,
                                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                                    color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface
+                                                    color = if (isSelected) Color.White else Color(0xFF94A3B8)
                                                 )
                                             }
                                         }
@@ -603,13 +604,13 @@ fun AddGameDialog(
                                             )
                                         },
                                         colors = ButtonDefaults.buttonColors(
-                                            containerColor = Color(0xFF27272A),
+                                            containerColor = Color(0xFF1E1E28),
                                             contentColor = Color.White
                                         ),
-                                        shape = RoundedCornerShape(8.dp),
+                                        shape = RoundedCornerShape(percent = 50),
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .height(42.dp)
+                                            .height(44.dp)
                                     ) {
                                         Icon(
                                             imageVector = Icons.Default.AddPhotoAlternate,
@@ -629,97 +630,98 @@ fun AddGameDialog(
                                         Row(
                                             verticalAlignment = Alignment.CenterVertically,
                                             modifier = Modifier
-                                                .fillMaxWidth()
-                                                .clip(RoundedCornerShape(6.dp))
-                                                .background(Color(0xFF18181D))
-                                                .padding(8.dp)
-                                        ) {
-                                            GameCoverImage(
-                                                coverUrl = selectedCoverUrl,
-                                                contentDescription = "Náhled",
-                                                modifier = Modifier.size(width = 36.dp, height = 54.dp),
-                                                cornerRadius = 4
-                                            )
-                                            Spacer(modifier = Modifier.width(10.dp))
-                                            Text(
-                                                text = "Obal vybrán ✓",
-                                                fontSize = 12.sp,
-                                                fontWeight = FontWeight.Bold,
-                                                color = Color.White,
-                                                modifier = Modifier.weight(1f)
-                                            )
-                                            TextButton(onClick = { selectedCoverUrl = "" }) {
-                                                Text("Odebrat", color = Color(0xFFEF4444), fontSize = 11.sp)
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                                                 .fillMaxWidth()
+                                                 .clip(RoundedCornerShape(12.dp))
+                                                 .background(Color(0xFF14141B))
+                                                 .border(1.dp, Color(0xFF262634), RoundedCornerShape(12.dp))
+                                                 .padding(8.dp)
+                                         ) {
+                                             GameCoverImage(
+                                                 coverUrl = selectedCoverUrl,
+                                                 contentDescription = "Náhled",
+                                                 modifier = Modifier.size(width = 36.dp, height = 54.dp),
+                                                 cornerRadius = 6
+                                             )
+                                             Spacer(modifier = Modifier.width(10.dp))
+                                             Text(
+                                                 text = "Obal vybrán ✓",
+                                                 fontSize = 12.sp,
+                                                 fontWeight = FontWeight.Bold,
+                                                 color = Color.White,
+                                                 modifier = Modifier.weight(1f)
+                                             )
+                                             TextButton(onClick = { selectedCoverUrl = "" }) {
+                                                 Text("Odebrat", color = Color(0xFFEF4444), fontSize = 11.sp)
+                                             }
+                                         }
+                                     }
+                                 }
+                             }
+                         }
+                     }
 
-                    Spacer(modifier = Modifier.height(10.dp))
+                     Spacer(modifier = Modifier.height(10.dp))
 
-                    // Bottom Action Buttons
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 8.dp, bottom = 12.dp),
-                        horizontalArrangement = Arrangement.End,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        TextButton(
-                            onClick = onDismiss,
-                            modifier = Modifier.height(48.dp)
-                        ) {
-                            Text("Zrušit", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        }
+                     // Bottom Action Buttons (M3 Expressive Pills)
+                     Row(
+                         modifier = Modifier
+                             .fillMaxWidth()
+                             .padding(top = 8.dp, bottom = 12.dp),
+                         horizontalArrangement = Arrangement.End,
+                         verticalAlignment = Alignment.CenterVertically
+                     ) {
+                         TextButton(
+                             onClick = onDismiss,
+                             modifier = Modifier.height(48.dp)
+                         ) {
+                             Text("Zrušit", color = Color(0xFF94A3B8))
+                         }
 
-                        Spacer(modifier = Modifier.width(12.dp))
+                         Spacer(modifier = Modifier.width(12.dp))
 
-                        Button(
-                            onClick = {
-                                if (selectedTitle.isNotBlank()) {
-                                    val hours = initialHours.toLongOrNull() ?: 0L
-                                    viewModel.addGame(
-                                        title = selectedTitle,
-                                        platform = selectedPlatform,
-                                        coverUrl = selectedCoverUrl,
-                                        description = selectedDescription,
-                                        releaseYear = selectedYear,
-                                        genres = selectedGenres,
-                                        developer = selectedDeveloper,
-                                        status = selectedStatus,
-                                        rating = selectedRating,
-                                        review = selectedReview,
-                                        notes = selectedNotes,
-                                        initialPlayTimeMinutes = hours * 60
-                                    )
-                                    onDismiss()
-                                }
-                            },
-                            enabled = selectedTitle.isNotBlank(),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.White,
-                                contentColor = Color.Black,
-                                disabledContainerColor = Color(0xFF27272A),
-                                disabledContentColor = Color(0xFF71717A)
-                            ),
-                            shape = RoundedCornerShape(10.dp),
-                            modifier = Modifier
-                                .height(48.dp)
-                                .testTag("add_game_submit_button")
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = null,
-                                tint = if (selectedTitle.isNotBlank()) Color.Black else Color(0xFF71717A),
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text("Přidat do knihovny", fontWeight = FontWeight.Bold)
-                        }
-                    }
+                         Button(
+                             onClick = {
+                                 if (selectedTitle.isNotBlank()) {
+                                     val hours = initialHours.toLongOrNull() ?: 0L
+                                     viewModel.addGame(
+                                         title = selectedTitle,
+                                         platform = selectedPlatform,
+                                         coverUrl = selectedCoverUrl,
+                                         description = selectedDescription,
+                                         releaseYear = selectedYear,
+                                         genres = selectedGenres,
+                                         developer = selectedDeveloper,
+                                         status = selectedStatus,
+                                         rating = selectedRating,
+                                         review = selectedReview,
+                                         notes = selectedNotes,
+                                         initialPlayTimeMinutes = hours * 60
+                                     )
+                                     onDismiss()
+                                 }
+                             },
+                             enabled = selectedTitle.isNotBlank(),
+                             colors = ButtonDefaults.buttonColors(
+                                 containerColor = Color.White,
+                                 contentColor = Color.Black,
+                                 disabledContainerColor = Color(0xFF1E1E26),
+                                 disabledContentColor = Color(0xFF64748B)
+                             ),
+                             shape = RoundedCornerShape(percent = 50),
+                             modifier = Modifier
+                                 .height(48.dp)
+                                 .testTag("add_game_submit_button")
+                         ) {
+                             Icon(
+                                 imageVector = Icons.Default.Add,
+                                 contentDescription = null,
+                                 tint = if (selectedTitle.isNotBlank()) Color.Black else Color(0xFF64748B),
+                                 modifier = Modifier.size(18.dp)
+                             )
+                             Spacer(modifier = Modifier.width(6.dp))
+                             Text("Přidat do knihovny", fontWeight = FontWeight.Bold)
+                         }
+                     }
                 }
             }
         }

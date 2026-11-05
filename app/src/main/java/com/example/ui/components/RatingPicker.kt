@@ -50,7 +50,7 @@ fun RatingPicker(
         7 to "Dobré (7/10)",
         8 to "Skvělé (8/10)",
         9 to "Vynikající (9/10)",
-        10 to "Mistrovské dílo (10/10)"
+        10 to "Mistrovské dílo (10/10) 🏆"
     )
 
     Column(modifier = modifier.fillMaxWidth()) {
@@ -63,7 +63,7 @@ fun RatingPicker(
                 Icon(
                     imageVector = Icons.Default.Star,
                     contentDescription = null,
-                    tint = if (ratingValue > 0) RatingGold else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                    tint = if (ratingValue > 0) RatingGold else Color(0xFF64748B),
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(6.dp))
@@ -71,22 +71,23 @@ fun RatingPicker(
                     text = "Hodnocení:",
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = Color.White
                 )
             }
 
             if (ratingValue > 0) {
+                val scorePill = RoundedCornerShape(percent = 50)
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(Color(0xFF27272A))
-                        .border(1.dp, Color(0x33FFFFFF), RoundedCornerShape(4.dp))
-                        .padding(horizontal = 8.dp, vertical = 3.dp)
+                        .clip(scorePill)
+                        .background(RatingGold.copy(alpha = 0.2f))
+                        .border(1.dp, RatingGold, scorePill)
+                        .padding(horizontal = 10.dp, vertical = 3.dp)
                 ) {
                     Text(
                         text = "$ratingValue / 10",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
+                        color = RatingGold,
+                        fontWeight = FontWeight.ExtraBold,
                         fontSize = 12.sp
                     )
                 }
@@ -94,37 +95,37 @@ fun RatingPicker(
                 Text(
                     text = "Nehodnoceno",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = Color(0xFF94A3B8)
                 )
             }
         }
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        // Number Grid 1 to 10
+        // Number Grid 1 to 10 with Expressive Pill / Squircle
         FlowRow(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            val itemShape = RoundedCornerShape(6.dp)
+            val itemShape = RoundedCornerShape(percent = 50)
             for (score in 1..10) {
                 val isSelected = currentRating == score
                 Box(
                     modifier = Modifier
-                        .size(32.dp)
+                        .size(34.dp)
                         .clip(itemShape)
                         .background(
-                            if (isSelected) Color.White else Color(0xFF18181B)
+                            if (isSelected) RatingGold else Color(0xFF13131A)
                         )
                         .border(
                             width = 1.dp,
-                            color = if (isSelected) Color.White else Color(0xFF27272A),
+                            color = if (isSelected) RatingGold else Color(0xFF262634),
                             shape = itemShape
                         )
                         .clickable {
                             if (isSelected) {
-                                onRatingSelected(null) // Unselect
+                                onRatingSelected(null)
                             } else {
                                 onRatingSelected(score)
                             }
@@ -133,8 +134,8 @@ fun RatingPicker(
                 ) {
                     Text(
                         text = "$score",
-                        fontWeight = if (isSelected) FontWeight.Black else FontWeight.Medium,
-                        color = if (isSelected) Color.Black else Color(0xFFA1A1AA),
+                        fontWeight = if (isSelected) FontWeight.Black else FontWeight.Bold,
+                        color = if (isSelected) Color.Black else Color(0xFF94A3B8),
                         fontSize = 12.sp
                     )
                 }
@@ -147,7 +148,7 @@ fun RatingPicker(
                 text = ratingLabels[ratingValue] ?: "",
                 style = MaterialTheme.typography.bodySmall,
                 color = RatingGold,
-                fontWeight = FontWeight.Medium,
+                fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(start = 2.dp)
             )
         }
