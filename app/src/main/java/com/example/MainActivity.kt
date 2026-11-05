@@ -80,6 +80,7 @@ class MainActivity : ComponentActivity() {
         )
 
         val app = application as GamePalApplication
+        com.example.service.SessionManager.restoreSessionIfNeeded(this)
 
         // Check if opened from Live Activity notification
         val openGameId = intent.getLongExtra("GAME_ID", -1L)
@@ -196,14 +197,18 @@ fun GamePalApp(
         label = "DialogBackdropBlur"
     )
 
+    val contentModifier = if (showAddDialog && blurRadius > 0.dp) {
+        Modifier.fillMaxSize().blur(radius = blurRadius)
+    } else {
+        Modifier.fillMaxSize()
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         AnimatedContent(
             targetState = selectedGame,
             transitionSpec = { fadeIn() togetherWith fadeOut() },
             label = "ScreenTransition",
-            modifier = Modifier
-                .fillMaxSize()
-                .blur(radius = blurRadius)
+            modifier = contentModifier
         ) { game ->
             if (game != null) {
                 GameDetailScreen(

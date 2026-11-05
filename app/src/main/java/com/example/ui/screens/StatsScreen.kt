@@ -112,6 +112,29 @@ val GenrePalette = listOf(
     Color(0xFFE11D48)  // Rose
 )
 
+// Internal data holder to memoize all stats computations and eliminate repeated loops during scroll
+private data class ComputedStats(
+    val totalGames: Int,
+    val totalHours: Long,
+    val totalMinutes: Long,
+    val completedGamesCount: Int,
+    val playingGamesCount: Int,
+    val backlogGamesCount: Int,
+    val pausedGamesCount: Int,
+    val droppedGamesCount: Int,
+    val completionRate: Float,
+    val ratedGamesCount: Int,
+    val avgRating: Double,
+    val hallOfFame: List<GameEntity>,
+    val mostPlayedGame: GameEntity?,
+    val genreStats: List<GenreAnalyticsItem>,
+    val platformStats: List<PlatformAnalyticsItem>,
+    val ratingDistribution: List<Pair<Int, Int>>,
+    val totalSessionsCount: Int,
+    val longestSessionSec: Long,
+    val avgSessionSec: Long
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatsScreen(
@@ -133,49 +156,42 @@ fun StatsScreen(
         )
     }
 
-    // Aggregations
-    val totalGames = allGames.size
-    val totalPlaySeconds = allGames.sumOf { it.totalPlayTimeSeconds }
-    val totalHours = totalPlaySeconds / 3600
-    val totalMinutes = (totalPlaySeconds % 3600) / 60
-    val completedGamesCount = allGames.count { it.status == GameStatus.COMPLETED.id }
-    val playingGamesCount = allGames.count { it.status == GameStatus.PLAYING.id }
-    val backlogGamesCount = allGames.count { it.status == GameStatus.BACKLOG.id }
-    val pausedGamesCount = allGames.count { it.status == GameStatus.PAUSED.id }
-    val droppedGamesCount = allGames.count { it.status == GameStatus.DROPPED.id }
+    // Fully memoized aggregation: computes once when games or sessions change, never during scrolling!
+    val stats = remember(allGames, allSessions) {
+        val totalGames = allGames.size
+        val totalPlaySeconds = allGames.sumOf { it.totalPlayTimeSeconds }
+        val totalHours = totalPlaySeconds / 3600
+        val totalMinutes = (totalPlaySeconds % 3600) / 60
+        val completedGamesCount = allGames.count { it.status == GameStatus.COMPLETED.id }
+        val playingGamesCount = allGames.count { it.status == GameStatus.PLAYING.id }
+        val backlogGamesCount = allGames.count { it.status == GameStatus.BACKLOG.id }
+        val pausedGamesCount = allGames.count { it.status == GameStatus.PAUSED.id }
+        val droppedGamesCount = allGames.count { it.status == GameStatus.DROPPED.id }
 
-    val completionRate = if (totalGames > 0) (completedGamesCount.toFloat() / totalGames * 100f) else 0f
+        val completionRate = if (totalGames > 0) (completedGamesCount.toFloat() / totalGames * 100f) else 0f
 
-    val ratedGames = allGames.filter { it.rating != null && it.rating > 0 }
-    val avgRating = if (ratedGames.isNotEmpty()) ratedGames.map { it.rating!! }.average() else 0.0
+        val ratedGames = allGames.filter { it.rating != null && it.rating > 0 }
+        val avgRating = if (ratedGames.isNotEmpty()) ratedGames.map { it.rating!! }.average() else 0.0
 
-    // Top rated games (Hall of Fame)
-    val hallOfFame = remember(allGames) {
-        allGames.filter { (it.rating ?: 0) >= 8 }
+        val hallOfFame = allGames.filter { (it.rating ?: 0) >= 8 }
             .sortedWith(compareByDescending<GameEntity> { it.rating }.thenByDescending { it.totalPlayTimeSeconds })
-    }
 
-    // Most played game
-    val mostPlayedGame = remember(allGames) {
-        allGames.maxByOrNull { it.totalPlayTimeSeconds }
-    }
+        val mostPlayedGame = allGames.maxByOrNull { it.totalPlayTimeSeconds }
 
-    // Genre Analytics Aggregation
-    val genreStats = remember(allGames) {
-        val map = mutableMapOf<String, Pair<Int, Long>>() // Genre -> (count, totalSec)
+        val genreMap = mutableMapOf<String, Pair<Int, Long>>()
         allGames.forEach { game ->
             val genresList = if (game.genres.isNotBlank()) {
                 game.genres.split(",", "/", ";", "•", "|").map { it.trim() }.filter { it.isNotBlank() }
             } else listOf("Ostatní")
 
             genresList.forEach { g ->
-                val curr = map.getOrDefault(g, Pair(0, 0L))
-                map[g] = Pair(curr.first + 1, curr.second + game.totalPlayTimeSeconds)
+                val curr = genreMap.getOrDefault(g, Pair(0, 0L))
+                genreMap[g] = Pair(curr.first + 1, curr.second + game.totalPlayTimeSeconds)
             }
         }
 
-        val totalGenreHits = map.values.sumOf { it.first }.coerceAtLeast(1)
-        map.entries
+        val totalGenreHits = genreMap.values.sumOf { it.first }.coerceAtLeast(1)
+        val genreStats = genreMap.entries
             .sortedByDescending { it.value.first }
             .take(8)
             .mapIndexed { index, entry ->
@@ -187,12 +203,9 @@ fun StatsScreen(
                     color = GenrePalette[index % GenrePalette.size]
                 )
             }
-    }
 
-    // Platform Analytics Aggregation
-    val platformStats = remember(allGames) {
         val grouped = allGames.groupBy { it.platform }
-        grouped.entries
+        val platformStats = grouped.entries
             .sortedByDescending { it.value.size }
             .map { entry ->
                 val pInfo = PlatformInfo.findByName(entry.key)
@@ -205,26 +218,44 @@ fun StatsScreen(
                     platformInfo = pInfo
                 )
             }
-    }
 
-    // Rating Distribution (1 to 10)
-    val ratingDistribution = remember(allGames) {
-        (1..10).map { score ->
+        val ratingDistribution = (1..10).map { score ->
             val count = allGames.count { it.rating == score }
             Pair(score, count)
         }
-    }
 
-    // Sessions metrics
-    val totalSessionsCount = allSessions.size
-    val longestSessionSec = allSessions.maxOfOrNull { it.durationSeconds } ?: 0L
-    val avgSessionSec = if (totalSessionsCount > 0) allSessions.sumOf { it.durationSeconds } / totalSessionsCount else 0L
+        val totalSessionsCount = allSessions.size
+        val longestSessionSec = allSessions.maxOfOrNull { it.durationSeconds } ?: 0L
+        val avgSessionSec = if (totalSessionsCount > 0) allSessions.sumOf { it.durationSeconds } / totalSessionsCount else 0L
+
+        ComputedStats(
+            totalGames = totalGames,
+            totalHours = totalHours,
+            totalMinutes = totalMinutes,
+            completedGamesCount = completedGamesCount,
+            playingGamesCount = playingGamesCount,
+            backlogGamesCount = backlogGamesCount,
+            pausedGamesCount = pausedGamesCount,
+            droppedGamesCount = droppedGamesCount,
+            completionRate = completionRate,
+            ratedGamesCount = ratedGames.size,
+            avgRating = avgRating,
+            hallOfFame = hallOfFame,
+            mostPlayedGame = mostPlayedGame,
+            genreStats = genreStats,
+            platformStats = platformStats,
+            ratingDistribution = ratingDistribution,
+            totalSessionsCount = totalSessionsCount,
+            longestSessionSec = longestSessionSec,
+            avgSessionSec = avgSessionSec
+        )
+    }
 
     Scaffold(
         containerColor = Color.Transparent,
         modifier = modifier.auroraBackground(isDark = true)
     ) { innerPadding ->
-        if (totalGames == 0) {
+        if (stats.totalGames == 0) {
             // Empty State
             EmptyStatsView(
                 isDark = true,
@@ -244,35 +275,35 @@ fun StatsScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 // 1. Hero Highlights 2x2 Grid
-                item {
+                item(key = "hero_highlights") {
                     HeroHighlightsGrid(
-                        totalHours = totalHours,
-                        totalMinutes = totalMinutes,
-                        totalGames = totalGames,
-                        completedCount = completedGamesCount,
-                        completionRate = completionRate,
-                        avgRating = avgRating,
-                        totalSessions = totalSessionsCount,
+                        totalHours = stats.totalHours,
+                        totalMinutes = stats.totalMinutes,
+                        totalGames = stats.totalGames,
+                        completedCount = stats.completedGamesCount,
+                        completionRate = stats.completionRate,
+                        avgRating = stats.avgRating,
+                        totalSessions = stats.totalSessionsCount,
                         isDark = true
                     )
                 }
 
                 // 2. Favorite Game / Most Played Spotlight
-                if (mostPlayedGame != null && mostPlayedGame.totalPlayTimeSeconds > 0) {
-                    item {
+                if (stats.mostPlayedGame != null && stats.mostPlayedGame.totalPlayTimeSeconds > 0) {
+                    item(key = "most_played") {
                         MostPlayedSpotlightCard(
-                            game = mostPlayedGame,
-                            onClick = { onGameClick(mostPlayedGame.id) },
+                            game = stats.mostPlayedGame,
+                            onClick = { onGameClick(stats.mostPlayedGame.id) },
                             isDark = true
                         )
                     }
                 }
 
                 // 3. Typy her & Žánry (Genre Breakdown Chart)
-                if (genreStats.isNotEmpty()) {
-                    item {
+                if (stats.genreStats.isNotEmpty()) {
+                    item(key = "genre_breakdown") {
                         GenreBreakdownCard(
-                            genreStats = genreStats,
+                            genreStats = stats.genreStats,
                             animationProgress = chartAnimation.value,
                             isDark = true
                         )
@@ -280,10 +311,10 @@ fun StatsScreen(
                 }
 
                 // 4. Herní platformy (Platform Breakdown Chart)
-                if (platformStats.isNotEmpty()) {
-                    item {
+                if (stats.platformStats.isNotEmpty()) {
+                    item(key = "platform_breakdown") {
                         PlatformBreakdownCard(
-                            platformStats = platformStats,
+                            platformStats = stats.platformStats,
                             animationProgress = chartAnimation.value,
                             isDark = true
                         )
@@ -291,21 +322,21 @@ fun StatsScreen(
                 }
 
                 // 5. Hodnocení her (Rating Distribution 1–10⭐)
-                item {
+                item(key = "rating_distribution") {
                     RatingDistributionCard(
-                        ratingDistribution = ratingDistribution,
-                        ratedCount = ratedGames.size,
-                        avgRating = avgRating,
+                        ratingDistribution = stats.ratingDistribution,
+                        ratedCount = stats.ratedGamesCount,
+                        avgRating = stats.avgRating,
                         animationProgress = chartAnimation.value,
                         isDark = true
                     )
                 }
 
                 // 6. Hall of Fame (Nejlépe hodnocené hry 8–10)
-                if (hallOfFame.isNotEmpty()) {
-                    item {
+                if (stats.hallOfFame.isNotEmpty()) {
+                    item(key = "hall_of_fame") {
                         HallOfFameSection(
-                            games = hallOfFame,
+                            games = stats.hallOfFame,
                             onGameClick = onGameClick,
                             isDark = true
                         )
@@ -313,17 +344,17 @@ fun StatsScreen(
                 }
 
                 // 7. Stavy v knihovně & Herní aktivita
-                item {
+                item(key = "status_breakdown") {
                     StatusBreakdownCard(
-                        playingCount = playingGamesCount,
-                        completedCount = completedGamesCount,
-                        backlogCount = backlogGamesCount,
-                        pausedCount = pausedGamesCount,
-                        droppedCount = droppedGamesCount,
-                        totalGames = totalGames,
-                        totalSessions = totalSessionsCount,
-                        avgSessionSec = avgSessionSec,
-                        longestSessionSec = longestSessionSec,
+                        playingCount = stats.playingGamesCount,
+                        completedCount = stats.completedGamesCount,
+                        backlogCount = stats.backlogGamesCount,
+                        pausedCount = stats.pausedGamesCount,
+                        droppedCount = stats.droppedGamesCount,
+                        totalGames = stats.totalGames,
+                        totalSessions = stats.totalSessionsCount,
+                        avgSessionSec = stats.avgSessionSec,
+                        longestSessionSec = stats.longestSessionSec,
                         isDark = true
                     )
                 }
@@ -1077,7 +1108,7 @@ private fun HallOfFameSection(
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(games) { game ->
+            items(games, key = { it.id }) { game ->
                 Box(
                     modifier = Modifier
                         .width(130.dp)

@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,7 +28,16 @@ fun GameCoverImage(
     modifier: Modifier = Modifier,
     cornerRadius: Int = 8
 ) {
-    val shape = RoundedCornerShape(cornerRadius.dp)
+    val shape = remember(cornerRadius) { RoundedCornerShape(cornerRadius.dp) }
+    val context = LocalContext.current
+    val imageRequest = remember(coverUrl) {
+        if (coverUrl.isNotBlank()) {
+            ImageRequest.Builder(context)
+                .data(coverUrl)
+                .crossfade(100)
+                .build()
+        } else null
+    }
 
     Box(
         modifier = modifier
@@ -36,12 +46,9 @@ fun GameCoverImage(
             .border(0.5.dp, Color(0x1FFFFFFF), shape),
         contentAlignment = Alignment.Center
     ) {
-        if (coverUrl.isNotBlank()) {
+        if (imageRequest != null) {
             AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(coverUrl)
-                    .crossfade(true)
-                    .build(),
+                model = imageRequest,
                 contentDescription = contentDescription,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()

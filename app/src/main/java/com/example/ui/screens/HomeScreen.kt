@@ -63,6 +63,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -119,12 +120,19 @@ fun HomeScreen(
     val currentSort by viewModel.sortOption.collectAsState()
     val syncState by syncManager.syncState.collectAsState()
 
+    val activeGameId by remember { derivedStateOf { activeSession?.gameId } }
+    val popularPlatforms = remember {
+        listOf("PS5", "Xbox Series", "Switch", "Deck", "PC", "PS4", "PS2", "SNES", "NES")
+    }
+
     var showSortMenu by remember { mutableStateOf(false) }
     var gameToChangeCover by remember { mutableStateOf<GameEntity?>(null) }
     var showBackupDialog by remember { mutableStateOf(false) }
 
     // Gesture navigation handler: if searching or filtering, back clears search or filters
-    val hasActiveFilterOrSearch = searchQuery.isNotEmpty() || selectedStatus != null || selectedPlatform != null
+    val hasActiveFilterOrSearch by remember {
+        derivedStateOf { searchQuery.isNotEmpty() || selectedStatus != null || selectedPlatform != null }
+    }
     BackHandler(enabled = hasActiveFilterOrSearch) {
         if (searchQuery.isNotEmpty()) {
             viewModel.searchQuery.value = ""
@@ -428,10 +436,10 @@ fun HomeScreen(
                                 }
                             }
 
-                            listOf("PS5", "Xbox Series", "Switch", "Deck", "PC", "PS4", "PS2", "SNES", "NES").forEach { pShort ->
+                            popularPlatforms.forEach { pShort ->
                                 val p = PlatformInfo.findByName(pShort)
                                 val isSel = selectedPlatform.equals(p.name, ignoreCase = true)
-                                item {
+                                item(key = "platform_$pShort") {
                                     Box(
                                         modifier = Modifier
                                             .clip(RoundedCornerShape(8.dp))
@@ -552,7 +560,7 @@ fun HomeScreen(
                 items(games, key = { it.id }) { game ->
                     GameCard(
                         game = game,
-                        isTracking = activeSession?.gameId == game.id,
+                        isTracking = activeGameId == game.id,
                         onClick = { onGameClick(game.id) },
                         onQuickPlay = { viewModel.startSession(context, game) },
                         onChangeCover = { gameToChangeCover = game },

@@ -8,6 +8,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
@@ -28,7 +29,7 @@ class GameSessionTrackingService : Service() {
     private var lastGameId: Long? = null
 
     companion object {
-        const val CHANNEL_ID = "gamepal_live_activity_channel_v2"
+        const val CHANNEL_ID = "gamepal_live_activity_channel_v3"
         const val NOTIFICATION_ID = 1001
 
         const val ACTION_START = "com.example.service.ACTION_START"
@@ -38,18 +39,22 @@ class GameSessionTrackingService : Service() {
 
         fun createNotificationChannel(context: Context) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                try {
+                    manager.deleteNotificationChannel("gamepal_live_activity_channel_v2")
+                } catch (_: Exception) {}
+
                 val channel = NotificationChannel(
                     CHANNEL_ID,
                     "PlayPulse - Živá aktivita (Aktivní hraní)",
-                    NotificationManager.IMPORTANCE_DEFAULT
+                    NotificationManager.IMPORTANCE_HIGH
                 ).apply {
-                    description = "Zobrazuje aktivní odpočet a čas hraní na zamčené obrazovce a v liště oznámení"
+                    description = "Zobrazuje aktivní odpočet a čas hraní na hodinkách (Pixel Watch), zamčené obrazovce a v liště oznámení"
                     lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-                    setShowBadge(false)
-                    enableVibration(false)
-                    setSound(null, null)
+                    setShowBadge(true)
+                    enableVibration(true)
+                    vibrationPattern = longArrayOf(0, 150)
                 }
-                val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 manager.createNotificationChannel(channel)
             }
         }
@@ -84,7 +89,7 @@ class GameSessionTrackingService : Service() {
 
         when (action) {
             ACTION_TOGGLE_PAUSE -> {
-                val current = SessionManager.activeSession.value
+                val current = SessionManager.activeSession.value ?: SessionManager.restoreSessionIfNeeded(this)
                 if (current != null) {
                     if (current.isPaused) {
                         SessionManager.resumeSession(this)
@@ -92,6 +97,7 @@ class GameSessionTrackingService : Service() {
                         SessionManager.pauseSession(this)
                     }
                 }
+                return START_STICKY
             }
             ACTION_STOP -> {
                 val finished = SessionManager.stopSession(this)
@@ -121,7 +127,7 @@ class GameSessionTrackingService : Service() {
                 return START_NOT_STICKY
             }
             ACTION_START, ACTION_UPDATE, null -> {
-                val current = SessionManager.activeSession.value
+                val current = SessionManager.activeSession.value ?: SessionManager.restoreSessionIfNeeded(this)
                 if (current != null) {
                     lastWasPaused = current.isPaused
                     lastGameId = current.gameId
@@ -143,9 +149,11 @@ class GameSessionTrackingService : Service() {
                     } catch (e: Exception) {
                         android.util.Log.e("GameSessionTrackingService", "startForeground failed", e)
                     }
+                    return START_STICKY
                 } else {
                     stopForeground(STOP_FOREGROUND_REMOVE)
                     stopSelf()
+                    return START_NOT_STICKY
                 }
             }
         }
@@ -155,7 +163,7 @@ class GameSessionTrackingService : Service() {
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
-        val current = SessionManager.activeSession.value
+        val current = SessionManager.activeSession.value ?: SessionManager.restoreSessionIfNeeded(this)
         if (current == null) {
             stopForeground(STOP_FOREGROUND_REMOVE)
             stopSelf()
@@ -204,6 +212,33 @@ class GameSessionTrackingService : Service() {
             "Aktivní hraní"
         }
 
+        val pauseIcon = if (session.isPaused) android.R.drawable.ic_media_play else android.R.drawable.ic_media_pause
+        val stopIcon = android.R.drawable.ic_menu_close_clear_cancel
+
+        // Wear OS / Pixel Watch Extender: adds smartwatch actions and ensures notification mirrors to watch
+        val wearableToggleAction = NotificationCompat.Action.Builder(
+            pauseIcon,
+            if (session.isPaused) "Pokračovat" else "Pozastavit",
+            togglePausePendingIntent
+        ).build()
+
+        val wearableStopAction = NotificationCompat.Action.Builder(
+            stopIcon,
+            "Ukončit",
+            stopPendingIntent
+        ).build()
+
+        val wearableExtender = NotificationCompat.WearableExtender()
+            .addAction(wearableToggleAction)
+            .addAction(wearableStopAction)
+            .setHintShowBackgroundOnly(false)
+
+        val appIconBitmap = try {
+            BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher)
+        } catch (_: Exception) {
+            null
+        }
+
         // Hardware chronometer base time: System clock minus total elapsed so far
         val baseWhen = System.currentTimeMillis() - (session.elapsedSeconds * 1000L)
 
@@ -212,33 +247,42 @@ class GameSessionTrackingService : Service() {
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle("🎮 ${session.gameTitle}")
             .setContentText(statusText)
-            .setSubText("Live Activity")
+            .setSubText("PlayPulse Live")
             .setContentIntent(openAppPendingIntent)
             .setOngoing(true)
+            .setLocalOnly(false)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setCategory(NotificationCompat.CATEGORY_PROGRESS)
+            .setCategory(NotificationCompat.CATEGORY_WORKOUT)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setUsesChronometer(!session.isPaused)
             .setWhen(baseWhen)
             .setShowWhen(true)
+            .extend(wearableExtender)
             .build()
 
         val builder = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle("🎮 ${session.gameTitle} (${session.platform})")
             .setContentText(statusText)
-            .setSubText("Live Activity")
+            .setSubText("PlayPulse Live")
             .setContentIntent(openAppPendingIntent)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
+            .setLocalOnly(false)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setPublicVersion(publicNotification)
-            .setCategory(NotificationCompat.CATEGORY_PROGRESS)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setCategory(NotificationCompat.CATEGORY_WORKOUT)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setUsesChronometer(!session.isPaused)
             .setWhen(baseWhen)
             .setShowWhen(true)
-            .addAction(0, pauseTitle, togglePausePendingIntent)
-            .addAction(0, "⏹ Ukončit", stopPendingIntent)
+            .addAction(pauseIcon, pauseTitle, togglePausePendingIntent)
+            .addAction(stopIcon, "⏹ Ukončit", stopPendingIntent)
+            .extend(wearableExtender)
+
+        if (appIconBitmap != null) {
+            builder.setLargeIcon(appIconBitmap)
+        }
 
         return builder.build()
     }

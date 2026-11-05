@@ -52,6 +52,30 @@ enum class MainNavTab(
     STATS("Statistiky", Icons.Default.BarChart, Icons.Outlined.BarChart)
 }
 
+private val BottomBarScrimBrush = Brush.verticalGradient(
+    colors = listOf(
+        Color.Transparent,
+        Color(0x7709090B),
+        Color(0xD909090B),
+        Color(0xFF09090B)
+    )
+)
+
+private val BottomBarBackgroundBrush = Brush.verticalGradient(
+    colors = listOf(
+        Color(0xF518181D),
+        Color(0xF8121215),
+        Color(0xFF09090B)
+    )
+)
+
+private val BottomBarBorderBrush = Brush.verticalGradient(
+    colors = listOf(
+        Color(0x33FFFFFF),
+        Color(0x10FFFFFF)
+    )
+)
+
 @Composable
 fun FrostedBottomBar(
     currentTab: MainNavTab,
@@ -60,21 +84,12 @@ fun FrostedBottomBar(
     modifier: Modifier = Modifier,
     isDark: Boolean = true
 ) {
-    val barShape = RoundedCornerShape(14.dp)
+    val barShape = remember { RoundedCornerShape(14.dp) }
 
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color.Transparent,
-                        Color(0x7709090B),
-                        Color(0xD909090B),
-                        Color(0xFF09090B)
-                    )
-                )
-            )
+            .background(BottomBarScrimBrush)
             .windowInsetsPadding(WindowInsets.navigationBars)
             .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 14.dp),
         contentAlignment = Alignment.Center
@@ -89,23 +104,10 @@ fun FrostedBottomBar(
                     ambientColor = Color(0x66000000)
                 )
                 .clip(barShape)
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xF518181D), // Top specular matte
-                            Color(0xF8121215), // Mid body
-                            Color(0xFF09090B)  // Bottom depth
-                        )
-                    )
-                )
+                .background(BottomBarBackgroundBrush)
                 .border(
                     width = 1.dp,
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0x33FFFFFF), // Crisp top highlight
-                            Color(0x10FFFFFF)  // Subtle bottom rim
-                        )
-                    ),
+                    brush = BottomBarBorderBrush,
                     shape = barShape
                 )
                 .padding(horizontal = 8.dp, vertical = 6.dp)

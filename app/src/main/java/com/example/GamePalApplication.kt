@@ -8,11 +8,15 @@ import com.example.data.GameMetadataService
 import com.example.data.GameRepository
 import com.example.service.GameSessionTrackingService
 import com.example.service.SessionManager
+import coil.ImageLoader
+import coil.ImageLoaderFactory
+import coil.disk.DiskCache
+import coil.memory.MemoryCache
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class GamePalApplication : Application() {
+class GamePalApplication : Application(), ImageLoaderFactory {
 
     lateinit var database: AppDatabase
         private set
@@ -25,6 +29,24 @@ class GamePalApplication : Application() {
 
     val metadataService by lazy { GameMetadataService() }
 
+    override fun newImageLoader(): ImageLoader {
+        return ImageLoader.Builder(this)
+            .memoryCache {
+                MemoryCache.Builder(this)
+                    .maxSizePercent(0.25)
+                    .build()
+            }
+            .diskCache {
+                DiskCache.Builder()
+                    .directory(cacheDir.resolve("image_cache"))
+                    .maxSizeBytes(100L * 1024 * 1024)
+                    .build()
+            }
+            .respectCacheHeaders(false)
+            .crossfade(true)
+            .build()
+    }
+
     override fun onCreate() {
         super.onCreate()
         instance = this
@@ -34,6 +56,12 @@ class GamePalApplication : Application() {
 
         // Initialize Live Activity Notification Channel
         GameSessionTrackingService.createNotificationChannel(this)
+
+        // Restore active game session if process died or system restarted while session was active
+        val restoredSession = SessionManager.restoreSessionIfNeeded(this)
+        if (restoredSession != null && !restoredSession.isPaused) {
+            SessionManager.ensureForegroundServiceRunning(this)
+        }
 
         // Clear pre-populated sample games once so library is 100% clean for user
         val prefs = getSharedPreferences("gamepal_prefs", MODE_PRIVATE)
@@ -58,7 +86,7 @@ class GamePalApplication : Application() {
             override fun onActivityStarted(activity: Activity) {
                 startedActivities++
                 if (startedActivities == 1) {
-                    SessionManager.setAppInForeground(true)
+                    SessionManager.setAppInForeground(true, this@GamePalApplication)
                 }
             }
 
@@ -69,7 +97,7 @@ class GamePalApplication : Application() {
             override fun onActivityStopped(activity: Activity) {
                 startedActivities = (startedActivities - 1).coerceAtLeast(0)
                 if (startedActivities == 0) {
-                    SessionManager.setAppInForeground(false)
+                    SessionManager.setAppInForeground(false, this@GamePalApplication)
                 }
             }
 
